@@ -53,7 +53,7 @@
             android:focusableInTouchMode="true"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
 
-        <HorizontalScrollView
+        /<HorizontalScrollView
             android:id="@+id/chip_group_scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

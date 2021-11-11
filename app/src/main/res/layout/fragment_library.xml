@@ -37,29 +37,37 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/library_chipGroup"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            app:singleLine="true"
-            />
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/grid_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="2">
-        </androidx.recyclerview.widget.RecyclerView>
+            android:orientation="vertical"
+            >
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/library_chipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:singleLine="true"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/grid_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="2"
+                android:nestedScrollingEnabled="false">
+            </androidx.recyclerview.widget.RecyclerView>
 
 
 
-    </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
 
 
 
