@@ -1,6 +1,7 @@
 package de.erikspall.audiobookapp.ui.library
 
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -23,6 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import de.erikspall.audiobookapp.const.Layout
+import de.erikspall.audiobookapp.ui.bottom_sheets.ModalBottomSheet
 
 class LibraryFragment : Fragment() {
 
@@ -81,7 +83,8 @@ class LibraryFragment : Fragment() {
                     true
                 }
                 R.id.menu_add -> {
-                    // Handle delete icon press
+                    val modalBottomSheet = ModalBottomSheet()
+                    modalBottomSheet.show(requireActivity().supportFragmentManager, ModalBottomSheet.TAG)
                     true
                 }
                 R.id.menu_switch_layout -> {

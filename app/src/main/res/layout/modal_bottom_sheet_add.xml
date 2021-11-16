@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/import_from_phone"
+        android:textAlignment="viewStart"
+        app:icon="@drawable/ic_storage"
+        app:iconGravity="start"
+        app:iconPadding="24dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/import_from_google_drive"
+        android:textAlignment="viewStart"
+        app:icon="@drawable/ic_cloud"
+        app:iconGravity="start"
+        app:iconPadding="24dp"/>
+
+</LinearLayout>
