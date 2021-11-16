@@ -19,6 +19,7 @@
             @android:color/transparent
         </item>
 
+        <item name="text_input_style">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
 
     </style>
 </resources>

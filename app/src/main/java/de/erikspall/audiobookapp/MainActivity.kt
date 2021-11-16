@@ -1,6 +1,9 @@
 package de.erikspall.audiobookapp
 
+import android.app.SearchManager
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -33,6 +36,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
+
+
+
         //setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
         //supportActionBar?.hide()

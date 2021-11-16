@@ -22,7 +22,7 @@
 
 
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/library_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -31,7 +31,7 @@
                 app:title="@string/title_library"
                 app:menu="@menu/top_app_bar"
                 android:paddingEnd="16dp">
-            </androidx.appcompat.widget.Toolbar>
+            </com.google.android.material.appbar.MaterialToolbar>
 
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
