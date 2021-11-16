@@ -7,10 +7,15 @@
     <string name="search">Search</string>
     <string name="content_description_search">Search audiobooks</string>
     <string name="progress_text_view">Progress: %s%%</string>
+    <string name="progress_text_view_simple">%s%%</string>
     <string name="search_hint">Search library</string>
     <!-- Input Dialog -->
     <string name="input_title">Search</string>
     <string name="input_message">Search for title, author, genre, ...</string>
     <string name="input_cancel">Cancel</string>
     <string name="input_accept">Search!</string>
+    <string name="menu_add">Add</string>
+    <string name="menu_switch_layout_list">Show as list</string>
+    <string name="menu_switch_layout_grid">Show as grid</string>
+    <string name="menu_settings">Settings</string>
 </resources>

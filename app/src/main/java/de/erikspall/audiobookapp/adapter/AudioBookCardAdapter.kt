@@ -13,6 +13,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.erikspall.audiobookapp.R
+import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.data.dummy.DummyDataSource
 import de.erikspall.audiobookapp.model.Attribute
 
@@ -22,6 +23,7 @@ import de.erikspall.audiobookapp.model.Attribute
  */
 class AudioBookCardAdapter (
     private val context: Context?,
+    private val layout: Int
 ): RecyclerView.Adapter<AudioBookCardAdapter.AudioBookCardViewHolder>(){
     // Initialize the dummy data for testing
     val data = DummyDataSource.audioBooks
@@ -29,21 +31,41 @@ class AudioBookCardAdapter (
     /**
      * Init view elements
      */
-    class AudioBookCardViewHolder(view: View?): RecyclerView.ViewHolder(view!!) {
+    abstract class AudioBookCardViewHolder(view: View?): RecyclerView.ViewHolder(view!!) {
+
+    }
+
+    class GridCardViewHolder(view: View?): AudioBookCardViewHolder(view) {
         // Declare and init all of the list item UI components
         val book_image: ImageView = view!!.findViewById(R.id.book_image)
         val book_title: TextView = view!!.findViewById(R.id.book_title)
-        val book_chips: ChipGroup = view!!.findViewById(R.id.chip_group)
         val book_progress: TextView = view!!.findViewById(R.id.book_progress)
         val book_progress_indicator: LinearProgressIndicator = view!!.findViewById(R.id.book_progress_indicator)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AudioBookCardViewHolder {
-        /* ~Change layout here~ */
-        val layoutToUse = R.layout.grid_list_item
+    class ListViewHolder(view: View?): AudioBookCardViewHolder(view) {
+        val book_image: ImageView = view!!.findViewById(R.id.book_image)
+        val book_title: TextView = view!!.findViewById(R.id.book_title)
+        val book_progress: TextView = view!!.findViewById(R.id.book_progress)
+        val book_author: TextView = view!!.findViewById(R.id.book_author)
+        val book_duration: TextView = view!!.findViewById(R.id.book_duration)
+    }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AudioBookCardViewHolder {
+        //  Use a conditional to determine the layout type and set it accordingly.
+        //  if the layout variable is Layout.GRID the grid list item should be used. Otherwise the
+        //  the vertical/horizontal list item should be used.
+        val layoutToUse = when (layout){
+            Layout.GRID -> R.layout.grid_list_item
+            else -> R.layout.list_item
+        }
+        //  Inflate the layout
         val adapterLayout = LayoutInflater.from(parent.context).inflate(layoutToUse, parent, false)
-        return AudioBookCardViewHolder(adapterLayout)
+
+        return when(layout){
+            Layout.LIST -> ListViewHolder(adapterLayout)
+            else -> GridCardViewHolder(adapterLayout)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -61,29 +83,55 @@ class AudioBookCardAdapter (
         val resources = context?.resources
         val item = data[position]
 
-        holder.book_image.setImageResource(item.imageResourceId)
-        holder.book_title.text = item.title
-        holder.book_progress.text = resources?.getString(R.string.progress_text_view, item.progress.toString())
-        holder.book_progress_indicator.setProgress(item.progress, false)
 
 
+        // Shared among both layouts
 
-        holder.book_chips.removeAllViews()
-        /* Add all Info as Chips here */
         val authors = item.chipAttributes[Attribute.AUTHOR]
-        if (authors != null) {
-            for (author in authors!!) {
-                createAndAddChip(author, holder.book_chips)
+
+        when (layout) {
+            Layout.LIST -> { // If it's list
+                holder as ListViewHolder
+
+
+
+                holder.book_image.setImageResource(item.imageResourceId)
+                holder.book_title.text = item.title
+                holder.book_progress.text = resources?.getString(R.string.progress_text_view_simple, item.progress.toString())
+                holder.book_duration.text = "00:00:00" // TODO: Obviously
+                if (authors != null)
+                    holder.book_author.text = authors[0] // only display first
+
+            }
+            else -> { // Grid
+                holder as GridCardViewHolder
+
+                holder.book_image.setImageResource(item.imageResourceId)
+                holder.book_title.text = item.title
+                holder.book_progress.text = resources?.getString(R.string.progress_text_view, item.progress.toString())
+                holder.book_progress_indicator.setProgress(item.progress, false)
+
+                /*holder.book_chips.removeAllViews()
+                /* Add all Info as Chips here */
+
+                if (authors != null) {
+                    for (author in authors!!) {
+                        createAndAddChip(author, holder.book_chips)
+                    }
+                }
+
+
+                val genres = item.chipAttributes[Attribute.GENRE]
+                if (genres != null) {
+                    for (genre in genres!!) {
+                        createAndAddChip(genre, holder.book_chips)
+                    }
+                }*/
             }
         }
 
 
-        val genres = item.chipAttributes[Attribute.GENRE]
-        if (genres != null) {
-            for (genre in genres!!) {
-                createAndAddChip(genre, holder.book_chips)
-            }
-        }
+
 
     }
 
