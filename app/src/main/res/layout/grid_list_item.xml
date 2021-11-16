@@ -40,8 +40,6 @@
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
-
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/play_button"
             android:layout_width="wrap_content"
@@ -85,16 +83,6 @@
                 android:layout_height="wrap_content"
                 app:singleLine="true">
 
-                <!-- For testing purpose only
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Chip.Suggestion"
-                    android:layout_marginStart="8dp"
-                    android:checkable="false"
-                    android:clickable="false"
-                    android:text="Mark-Uwe-Kling"/>-->
-
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
         <FrameLayout
@@ -108,22 +96,6 @@
             app:layout_constraintBottom_toTopOf="@id/book_progress"
             app:layout_constraintWidth="true"
             app:layout_constraintHeight_default="spread"/>
-
-
-
-        <!--<TextView
-            android:id="@+id/book_author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"
-            app:layout_constraintBottom_toTopOf="@id/book_progress"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            tools:text="Author: Mark-Uwe Kling"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>-->
-
-
 
         <TextView
             android:id="@+id/book_progress"
