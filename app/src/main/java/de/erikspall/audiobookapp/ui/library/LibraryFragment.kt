@@ -53,6 +53,7 @@ class LibraryFragment : Fragment() {
             Layout.GRID // Use Grid as standard
         )
 
+        //TODO: Check if something was played and show card view
 
 
         // Specify fixed size to improve performance

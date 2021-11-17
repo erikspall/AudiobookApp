@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/now_playing_coordinator"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.now_playing.NowPlayingFragment">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/player_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="0dp"
+        app:title="@string/player_title"
+        app:menu="@menu/player_app_bar"
+        app:navigationIcon="@drawable/ic_down"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.Material3.CardView.Filled"
+        android:id="@+id/book_image_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:layout_marginHorizontal="24dp"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:cardCornerRadius="14dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player_toolbar">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/book_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                tools:srcCompat="@drawable/k1"
+                android:src="@drawable/ic_play"/>
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/total_book_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/book_image_container"
+        app:layout_constraintStart_toStartOf="@id/book_image_container"
+        app:layout_constraintEnd_toEndOf="@id/book_image_container"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="6dp"
+        app:trackCornerRadius="8dp"
+        tools:progress="45"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="55:21"
+        app:layout_constraintStart_toStartOf="@id/total_book_progress"
+        app:layout_constraintTop_toBottomOf="@id/total_book_progress"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="04:22:11"
+        app:layout_constraintEnd_toEndOf="@id/total_book_progress"
+        app:layout_constraintTop_toBottomOf="@id/total_book_progress"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_play"
+        style="?attr/floatingActionButtonLargePrimaryStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        app:srcCompat="@drawable/ic_play"
+        app:layout_constraintTop_toBottomOf="@id/total_book_progress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="48dp"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_forward"
+        style="?attr/floatingActionButtonSecondaryStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        android:layout_marginStart="4dp"
+        app:srcCompat="@drawable/ic_forward_30"
+        app:layout_constraintStart_toEndOf="@id/fab_play"
+        app:layout_constraintTop_toTopOf="@id/fab_play"
+        app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_backward"
+        style="?attr/floatingActionButtonSecondaryStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        android:layout_marginEnd="4dp"
+        app:srcCompat="@drawable/ic_backward_30"
+        app:layout_constraintEnd_toStartOf="@id/fab_play"
+        app:layout_constraintTop_toTopOf="@id/fab_play"
+        app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        style="?attr/floatingActionButtonTertiaryStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        android:layout_marginEnd="4dp"
+        app:srcCompat="@drawable/ic_skip_backward"
+        app:layout_constraintEnd_toStartOf="@id/fab_backward"
+        app:layout_constraintTop_toTopOf="@id/fab_play"
+        app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        style="?attr/floatingActionButtonTertiaryStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        android:layout_marginStart="4dp"
+        app:srcCompat="@drawable/ic_skip_forward"
+        app:layout_constraintStart_toEndOf="@id/fab_forward"
+        app:layout_constraintTop_toTopOf="@id/fab_play"
+        app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
+
+
+
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/player_bottom_app_bar"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -15,6 +16,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.color.DynamicColors
 import de.erikspall.audiobookapp.databinding.ActivityMainBinding
+import de.erikspall.audiobookapp.ui.library.LibraryFragmentDirections
 
 /**
  * Main Activity and entry point for the app. Displays a RecyclerView of audiobooks.
@@ -35,6 +37,13 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+
+
+        binding.miniPlayer.container.setOnClickListener {
+            val action = LibraryFragmentDirections.actionLibraryFragmentToNowPlayingFragment()
+            navController.navigate(action)
+            binding.miniPlayer.container.isVisible = false
+        }
 
         //setupActionBarWithNavController(navController)
 

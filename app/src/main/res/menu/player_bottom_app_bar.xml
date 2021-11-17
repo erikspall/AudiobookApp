@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/cast_button"
+        android:title="@string/cast_to_device"
+        android:icon="@drawable/ic_cast_disconnected"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/chapter_button"
+        android:title="@string/select_chapter"
+        android:icon="@drawable/ic_playlist"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/sleept_timer_button"
+        android:title="@string/set_sleep_timer"
+        android:icon="@drawable/ic_moon"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/equalizier_button"
+        android:title="@string/equalizier"
+        android:icon="@drawable/ic_equalizier"
+        app:showAsAction="always"/>
+
+
+</menu>
