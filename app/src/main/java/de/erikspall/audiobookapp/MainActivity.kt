@@ -1,20 +1,15 @@
 package de.erikspall.audiobookapp
 
-import android.app.SearchManager
-import android.content.Intent
+
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
-import androidx.core.view.isVisible
+import androidx.core.view.*
+import androidx.core.view.ViewCompat.requestApplyInsets
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.color.DynamicColors
 import de.erikspall.audiobookapp.databinding.ActivityMainBinding
 import de.erikspall.audiobookapp.ui.library.LibraryFragmentDirections
 
@@ -39,18 +34,18 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
 
 
-        binding.miniPlayer.container.setOnClickListener {
-            val action = LibraryFragmentDirections.actionLibraryFragmentToNowPlayingFragment()
-            navController.navigate(action)
-            binding.miniPlayer.container.isVisible = false
-        }
+
 
         //setupActionBarWithNavController(navController)
 
         //supportActionBar?.hide()
     }
 
+
+
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
+
+
 }

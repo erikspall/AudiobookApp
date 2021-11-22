@@ -2,10 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/now_playing_coordinator"
+    android:id="@+id/now_playing_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.now_playing.NowPlayingFragment">
+
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/player_toolbar"
@@ -53,25 +54,74 @@
         app:layout_constraintTop_toBottomOf="@id/book_image_container"
         app:layout_constraintStart_toStartOf="@id/book_image_container"
         app:layout_constraintEnd_toEndOf="@id/book_image_container"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginEnd="34dp"
         android:layout_marginTop="6dp"
         app:trackCornerRadius="8dp"
         tools:progress="45"/>
 
+
+
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/total_current_progress_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="55:21"
         app:layout_constraintStart_toStartOf="@id/total_book_progress"
         app:layout_constraintTop_toBottomOf="@id/total_book_progress"/>
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/book_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Die Känguru Chroniken"
+            app:layout_constraintStart_toEndOf="@id/total_current_progress_text"
+            app:layout_constraintEnd_toStartOf="@id/total_duration_text"
+            app:layout_constraintTop_toBottomOf="@id/total_book_progress"/>
+
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/total_duration_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="04:22:11"
         app:layout_constraintEnd_toEndOf="@id/total_book_progress"
         app:layout_constraintTop_toBottomOf="@id/total_book_progress"/>
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/chapter_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/book_name"
+        app:layout_constraintStart_toStartOf="@id/total_book_progress"
+        app:layout_constraintEnd_toEndOf="@id/total_book_progress"
+        android:layout_marginTop="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/chapter_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Kapitel 1: Ein Känguru zieht ein"
+            app:layout_constraintStart_toEndOf="@id/total_current_progress_text"
+            app:layout_constraintEnd_toStartOf="@id/total_duration_text"
+            app:layout_constraintTop_toBottomOf="@id/chapter_slider"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/current_chapter_progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="0:00"
+        app:layout_constraintStart_toStartOf="@id/total_current_progress_text"
+        app:layout_constraintTop_toBottomOf="@id/chapter_slider"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/chapter_duration_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="5:41"
+        app:layout_constraintEnd_toEndOf="@id/total_duration_text"
+        app:layout_constraintTop_toBottomOf="@id/chapter_slider"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_play"
@@ -80,10 +130,11 @@
         android:layout_height="wrap_content"
         android:minWidth="0dp"
         app:srcCompat="@drawable/ic_play"
-        app:layout_constraintTop_toBottomOf="@id/total_book_progress"
+        app:layout_constraintTop_toBottomOf="@id/chapter_name"
+        app:layout_constraintBottom_toTopOf="@id/bottom_app_bar_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="48dp"/>
+        android:layout_marginTop="0dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_forward"
@@ -132,12 +183,17 @@
         app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
 
 
-
-
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/bottom_app_bar_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="parent">
     <com.google.android.material.bottomappbar.BottomAppBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/player_bottom_app_bar"/>
+        app:menu="@menu/player_bottom_app_bar"
+        android:layout_gravity="bottom"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -111,22 +111,6 @@ class AudioBookCardAdapter (
                 holder.book_progress.text = resources?.getString(R.string.progress_text_view, item.progress.toString())
                 holder.book_progress_indicator.setProgress(item.progress, false)
 
-                /*holder.book_chips.removeAllViews()
-                /* Add all Info as Chips here */
-
-                if (authors != null) {
-                    for (author in authors!!) {
-                        createAndAddChip(author, holder.book_chips)
-                    }
-                }
-
-
-                val genres = item.chipAttributes[Attribute.GENRE]
-                if (genres != null) {
-                    for (genre in genres!!) {
-                        createAndAddChip(genre, holder.book_chips)
-                    }
-                }*/
             }
         }
 
@@ -135,11 +119,4 @@ class AudioBookCardAdapter (
 
     }
 
-    private fun createAndAddChip(text: String, group: ChipGroup){
-        val chip = Chip(this.context)
-        chip.text = text
-        chip.isCheckable = false
-        chip.isClickable = false
-        group.addView(chip)
-    }
 }

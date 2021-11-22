@@ -1,7 +1,5 @@
 package de.erikspall.audiobookapp.ui.library
 
-
-import android.app.Activity
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -14,17 +12,17 @@ import com.google.android.material.chip.Chip
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
 import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
-import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.view.MenuItemCompat
-import androidx.core.view.get
+import androidx.core.view.*
+import androidx.core.widget.NestedScrollView
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import androidx.recyclerview.widget.RecyclerView
 import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.ui.bottom_sheets.ModalBottomSheet
+import de.erikspall.audiobookapp.utils.Conversion
 
 class LibraryFragment : Fragment() {
 
@@ -40,12 +38,12 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         libraryViewModel =
             ViewModelProvider(this).get(LibraryViewModel::class.java)
 
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
 
 
         binding.libraryRecyclerView.adapter = AudioBookCardAdapter(
@@ -54,7 +52,33 @@ class LibraryFragment : Fragment() {
         )
 
         //TODO: Check if something was played and show card view
+        binding.miniPlayer.container.setOnClickListener {
+            val action = LibraryFragmentDirections.actionLibraryFragmentToNowPlayingFragment()
+            binding.miniPlayer.container.findNavController().navigate(action)
+            binding.miniPlayer.container.isVisible = false
+        }
 
+
+
+        // Prevent mini player from being under nav bar
+        ViewCompat.setOnApplyWindowInsetsListener(binding.miniPlayer.container) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply the insets as a margin to the view. Here the system is setting
+            // only the bottom, left, and right dimensions, but apply whichever insets are
+            // appropriate to your layout. You can also update the view padding
+            // if that's more appropriate.
+
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams>{
+                leftMargin = insets.left + 5
+                bottomMargin = insets.bottom
+                rightMargin = insets.right + 5
+            }
+
+            // Return CONSUMED if you don't want want the window insets to keep being
+            // passed down to descendant views.
+            //WindowInsetsCompat.CONSUMED
+            windowInsets
+        }
 
         // Specify fixed size to improve performance
         binding.libraryRecyclerView.setHasFixedSize(true)
@@ -107,35 +131,61 @@ class LibraryFragment : Fragment() {
         }
 */
 
+
+
+
+
+                // This is a workaround for a bug. CollapsingToolbar layout is consuming the insets and not
+                // passing them to child. DO NOT REMOVE
+                ViewCompat.setOnApplyWindowInsetsListener(binding.libraryCollapsingtoolbarlayout){ view, windowInsets ->
+                    val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                    view.updateLayoutParams<ViewGroup.MarginLayoutParams>{
+                        topMargin = insets.top
+                    }
+                    windowInsets
+                }
+
+                ViewCompat.setOnApplyWindowInsetsListener(binding.libraryRecyclerView) { view, windowInsets ->
+                    val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                    // Apply the insets as a margin to the view. Here the system is setting
+                    // only the bottom, left, and right dimensions, but apply whichever insets are
+                    // appropriate to your layout. You can also update the view padding
+                    // if that's more appropriate.
+
+                    view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+
+                        bottomMargin =
+                            insets.bottom + Conversion.dpToPx(80) //TODO: Find a way to obtain height of mini player
+                    }
+
+                    // Return CONSUMED if you don't want want the window insets to keep being
+                    // passed down to descendant views.
+                    WindowInsetsCompat.CONSUMED
+                }
+
+
+        /*ViewCompat.setOnApplyWindowInsetsListener(binding.libraryRecyclerView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply the insets as a margin to the view. Here the system is setting
+            // only the bottom, left, and right dimensions, but apply whichever insets are
+            // appropriate to your layout. You can also update the view padding
+            // if that's more appropriate.
+
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams>{
+
+                bottomMargin = insets.bottom + Conversion.pxToDp(binding.miniPlayer.container.height)
+            }
+
+            // Return CONSUMED if you don't want want the window insets to keep being
+            // passed down to descendant views.
+            WindowInsetsCompat.CONSUMED
+        }*/
+
+
+
         return root
     }
-/*
 
-
-    fun enterSearchState(searchText:String){
-        binding.libraryToolbar.setNavigationIcon(R.drawable.ic_close)
-
-        //TODO: maybe replace with group?
-        binding.libraryToolbar.menu.getItem(0).isVisible = false //Search
-        binding.libraryToolbar.menu.getItem(1).isVisible = false //Add
-
-        //TODO: Search stuff here
-
-        binding.libraryCollapsingtoolbarlayout.title = "\"" + searchText + "\""
-    }
-
-    fun leaveSearchState(){
-        binding.libraryToolbar.navigationIcon = null
-        binding.libraryToolbar.menu.getItem(0).isVisible = true //Search
-        binding.libraryToolbar.menu.getItem(1).isVisible = true //Add
-
-        //TODO: Restore here
-
-        binding.libraryCollapsingtoolbarlayout.title = getString(R.string.title_library)
-
-
-    }
-*/
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
