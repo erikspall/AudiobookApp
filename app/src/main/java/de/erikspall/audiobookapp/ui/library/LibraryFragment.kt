@@ -1,45 +1,62 @@
 package de.erikspall.audiobookapp.ui.library
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.*
-import android.widget.*
-
-import androidx.fragment.app.Fragment
-
-import androidx.lifecycle.ViewModelProvider
-
-import com.google.android.material.chip.Chip
-import de.erikspall.audiobookapp.R
-import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
-import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.*
-import androidx.core.widget.NestedScrollView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
+import de.erikspall.audiobookapp.AudioBookApp
+import de.erikspall.audiobookapp.R
+import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
 import de.erikspall.audiobookapp.const.Layout
+import de.erikspall.audiobookapp.data.handling.import.Importer
+import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
 import de.erikspall.audiobookapp.ui.bottom_sheets.ModalBottomSheet
+import de.erikspall.audiobookapp.ui.viewmodels.DatabaseViewModel
+import de.erikspall.audiobookapp.ui.viewmodels.DatabaseViewModelFactory
 import de.erikspall.audiobookapp.utils.Conversion
+import kotlinx.coroutines.launch
 
 class LibraryFragment : Fragment() {
 
-    private lateinit var libraryViewModel: LibraryViewModel
+
     private var _binding: FragmentLibraryBinding? = null
     private var isGridLayout = true
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private val viewModel: DatabaseViewModel by activityViewModels {
+        DatabaseViewModelFactory(
+            (activity?.application as AudioBookApp).database.audiobookDao(),
+            (activity?.application as AudioBookApp).database.personDao(),
+            (activity?.application as AudioBookApp).database.genreDao(),
+            (activity?.application as AudioBookApp).database.belongsToDao()
+        )
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        libraryViewModel =
-            ViewModelProvider(this).get(LibraryViewModel::class.java)
 
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -93,18 +110,21 @@ class LibraryFragment : Fragment() {
         binding.libraryToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.menu_search -> {
-                    /*MaterialAlertDialogBuilder(requireContext())
-                        .setIcon(R.drawable.ic_search)
-                        .setTitle(getString(R.string.input_title))
-                        .setView(R.layout.dialog_edit_text)
-                        .setNeutralButton(getString(R.string.input_cancel)) { dialog, which ->
-                            // Do nothing
-                        }
-                        .setPositiveButton(getString(R.string.input_accept)) { dialog, which ->
-                            // Search
-                        }
+                    Toast.makeText(requireContext(), "Search!", Toast.LENGTH_SHORT).show()
 
-                        .show()*/
+                    viewModel.addNewAudiobook("dummy/path", "Die Känguru Chroniken", 56)
+                    viewModel.addNewAudiobook("dummy/path", "Die Känguru Manifest", 56)
+                    viewModel.addNewAudiobook("dummy/path", "Harry Potter", 56)
+                    viewModel.addNewPerson("Mark-Uwe", "Kling")
+                    viewModel.addNewPerson("Joanne K.", "Rowling")
+                    viewModel.addNewGenre("Comedy")
+                    viewModel.addNewGenre("Fantasie")
+                    viewModel.addNewBelongsTo(1,1)
+                    viewModel.addNewBelongsTo(2,1)
+                    viewModel.addNewBelongsTo(3,2)
+
+
+
                     true
                 }
                 R.id.menu_add -> {
@@ -117,6 +137,37 @@ class LibraryFragment : Fragment() {
                     // Sets layout and icon
                     chooseLayout()
                     setIconAndTitle(menuItem)
+
+                    true
+                }
+                R.id.menu_settings -> {
+
+                    /*viewModel.getAllAudiobooksOfGenre(1).observe(viewLifecycleOwner, Observer {
+                        for (a in it){
+                            Toast.makeText(requireContext(), a.audiobookTitle, Toast.LENGTH_LONG).show()
+                        }
+
+                    })*/
+
+                    when {//TODO: move away
+                        ContextCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.ACCESS_MEDIA_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED -> {
+                           // Toast.makeText(requireContext(), "Already given", Toast.LENGTH_LONG).show()
+                        }
+                        else -> {
+                           //Toast.makeText(requireContext(), "Request that shit", Toast.LENGTH_LONG).show()
+                            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_MEDIA_LOCATION), 0)
+                        }
+                    }
+
+                    viewModel.viewModelScope.launch {
+                        Importer.createLocalImporter(requireContext()).getAllAsync()
+                        Toast.makeText(requireContext(), "Finished", Toast.LENGTH_LONG).show()
+                    }
+
+
 
                     true
                 }

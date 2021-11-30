@@ -6,16 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.view.size
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.data.dummy.DummyDataSource
-import de.erikspall.audiobookapp.model.Attribute
+import de.erikspall.audiobookapp.data.dummy.model.DummyAttribute
 
 /**
  * Adapter to inflate the appropriate list item layout and populate the view with information
@@ -26,7 +22,7 @@ class AudioBookCardAdapter (
     private val layout: Int
 ): RecyclerView.Adapter<AudioBookCardAdapter.AudioBookCardViewHolder>(){
     // Initialize the dummy data for testing
-    val data = DummyDataSource.audioBooks
+    val data = DummyDataSource.DUMMY_AUDIOBOOKS
 
     /**
      * Init view elements
@@ -87,7 +83,7 @@ class AudioBookCardAdapter (
 
         // Shared among both layouts
 
-        val authors = item.chipAttributes[Attribute.AUTHOR]
+        val authors = item.chipAttributes[DummyAttribute.AUTHOR]
 
         when (layout) {
             Layout.LIST -> { // If it's list

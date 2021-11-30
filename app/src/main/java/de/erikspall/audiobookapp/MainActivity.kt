@@ -2,16 +2,11 @@ package de.erikspall.audiobookapp
 
 
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.*
-import androidx.core.view.ViewCompat.requestApplyInsets
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import de.erikspall.audiobookapp.databinding.ActivityMainBinding
-import de.erikspall.audiobookapp.ui.library.LibraryFragmentDirections
 
 /**
  * Main Activity and entry point for the app. Displays a RecyclerView of audiobooks.

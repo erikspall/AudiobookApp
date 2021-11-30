@@ -1,11 +1,11 @@
-package de.erikspall.audiobookapp.model
+package de.erikspall.audiobookapp.data.dummy.model
 
 import androidx.annotation.DrawableRes
 
 /**
  * A data class to represent the information presented in the library cards and beyond
  */
-data class AudioBook (
+data class DummyAudiobook (
     /* data that shows in library */
     @DrawableRes val imageResourceId: Int,
     val title: String,
