@@ -26,10 +26,11 @@ import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
 import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.data.handling.import.Importer
+import de.erikspall.audiobookapp.data.model.Audiobook
+import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModel
+import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModelFactory
 import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
 import de.erikspall.audiobookapp.ui.bottom_sheets.ModalBottomSheet
-import de.erikspall.audiobookapp.ui.viewmodels.DatabaseViewModel
-import de.erikspall.audiobookapp.ui.viewmodels.DatabaseViewModelFactory
 import de.erikspall.audiobookapp.utils.Conversion
 import kotlinx.coroutines.launch
 
@@ -42,12 +43,9 @@ class LibraryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val viewModel: DatabaseViewModel by activityViewModels {
+    private val databaseViewModel: DatabaseViewModel by activityViewModels {
         DatabaseViewModelFactory(
-            (activity?.application as AudioBookApp).database.audiobookDao(),
-            (activity?.application as AudioBookApp).database.personDao(),
-            (activity?.application as AudioBookApp).database.genreDao(),
-            (activity?.application as AudioBookApp).database.belongsToDao()
+            (activity?.application as AudioBookApp).repository
         )
     }
 
@@ -112,19 +110,6 @@ class LibraryFragment : Fragment() {
                 R.id.menu_search -> {
                     Toast.makeText(requireContext(), "Search!", Toast.LENGTH_SHORT).show()
 
-                    viewModel.addNewAudiobook("dummy/path", "Die Känguru Chroniken", 56)
-                    viewModel.addNewAudiobook("dummy/path", "Die Känguru Manifest", 56)
-                    viewModel.addNewAudiobook("dummy/path", "Harry Potter", 56)
-                    viewModel.addNewPerson("Mark-Uwe", "Kling")
-                    viewModel.addNewPerson("Joanne K.", "Rowling")
-                    viewModel.addNewGenre("Comedy")
-                    viewModel.addNewGenre("Fantasie")
-                    viewModel.addNewBelongsTo(1,1)
-                    viewModel.addNewBelongsTo(2,1)
-                    viewModel.addNewBelongsTo(3,2)
-
-
-
                     true
                 }
                 R.id.menu_add -> {
@@ -161,11 +146,13 @@ class LibraryFragment : Fragment() {
                             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_MEDIA_LOCATION), 0)
                         }
                     }
+                    var test: List<Audiobook> = listOf()
+                    databaseViewModel.viewModelScope.launch {
+                         test = Importer.createLocalImporter(requireContext()).getAllAsync()
 
-                    viewModel.viewModelScope.launch {
-                        Importer.createLocalImporter(requireContext()).getAllAsync()
                         Toast.makeText(requireContext(), "Finished", Toast.LENGTH_LONG).show()
                     }
+
 
 
 

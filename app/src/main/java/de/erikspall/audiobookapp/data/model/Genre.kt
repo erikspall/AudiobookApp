@@ -6,9 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "genre")
 data class Genre (
-    @PrimaryKey(autoGenerate = true) val genreId: Int = 0,
-
+    @PrimaryKey(autoGenerate = true) val genreId: Long = 0,
     @ColumnInfo(name = "name")
-    val genreName: String,
-
+    val name: String
     )

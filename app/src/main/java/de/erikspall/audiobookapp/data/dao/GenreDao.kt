@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GenreDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(genre: Genre)
+    suspend fun insert(genre: Genre): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertSync(genre: Genre): Long
 
     @Update
     suspend fun update(genre: Genre)
@@ -21,6 +24,12 @@ interface GenreDao {
     @Query("SELECT * FROM genre")
     fun getItems(): Flow<List<Genre>>
 
+    @Query("SELECT EXISTS(SELECT * FROM genre WHERE name = :genre COLLATE NOCASE)")
+    fun genreExistsSync(genre: String): Boolean
+
+    @Query("SELECT * FROM genre WHERE name = :genre COLLATE NOCASE LIMIT 1")
+    fun getGenreSync(genre: String): Genre
+
     @Query("DELETE FROM genre")
-    suspend fun reset()
+    suspend fun deleteAll()
 }

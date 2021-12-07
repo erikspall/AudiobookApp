@@ -1,15 +1,27 @@
 package de.erikspall.audiobookapp.data.model
 
 import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
 
 @Entity(primaryKeys = [
     "audiobookId",
     "genreId"
-])
+],
+foreignKeys = [ForeignKey(
+    entity = Audiobook::class,
+    parentColumns = arrayOf("audiobookId"),
+    childColumns = arrayOf("audiobookId"),
+    onUpdate = ForeignKey.CASCADE,
+    onDelete = ForeignKey.CASCADE
+), ForeignKey(
+    entity = Genre::class,
+    parentColumns = arrayOf("genreId"),
+    childColumns = arrayOf("genreId"),
+    onUpdate = ForeignKey.CASCADE,
+    onDelete = ForeignKey.CASCADE
+)])
 data class BelongsTo (
-    val audiobookId: Int,
-    val genreId:Int
+    val audiobookId: Long,
+    val genreId:Long
 )
 
 data class GenreWithAudiobooks(
