@@ -59,12 +59,16 @@ class LibraryFragment : Fragment() {
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-
-
-        binding.libraryRecyclerView.adapter = AudioBookCardAdapter(
+        val adapter = AudioBookCardAdapter(
             this.requireContext(),
             Layout.GRID // Use Grid as standard
         )
+
+        binding.libraryRecyclerView.adapter = adapter
+
+        databaseViewModel.allAudiobooks.observe(viewLifecycleOwner) {audiobooks ->
+            audiobooks.let { adapter.submitList(it) }
+        }
 
         //TODO: Check if something was played and show card view
         binding.miniPlayer.container.setOnClickListener {
@@ -238,8 +242,11 @@ class LibraryFragment : Fragment() {
             binding.libraryRecyclerView.layoutManager = LinearLayoutManager(this.requireContext())
             layoutToUse = Layout.LIST
         }
-
-        binding.libraryRecyclerView.adapter = AudioBookCardAdapter(this.requireContext(), layoutToUse);
+        val adapter = AudioBookCardAdapter(this.requireContext(), layoutToUse)
+        binding.libraryRecyclerView.adapter = adapter
+        databaseViewModel.allAudiobooks.observe(viewLifecycleOwner) {audiobooks ->
+            audiobooks.let { adapter.submitList(it) }
+        }
     }
 
 
