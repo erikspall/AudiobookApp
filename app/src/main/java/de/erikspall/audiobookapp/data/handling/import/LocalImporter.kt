@@ -2,9 +2,11 @@ package de.erikspall.audiobookapp.data.handling.import
 
 import android.content.ContentUris
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import androidx.core.net.toUri
 import de.erikspall.audiobookapp.data.database.AudiobookRoomDatabase
 import de.erikspall.audiobookapp.data.model.Audiobook
 import de.erikspall.audiobookapp.data.model.BelongsTo
@@ -14,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class LocalImporter(val context: Context) : Importer<Audiobook> {
 
@@ -49,7 +52,8 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
             MediaStore.Audio.Media.BOOKMARK,
             MediaStore.Audio.Media.DISPLAY_NAME,
             MediaStore.Audio.Media.COMPOSER,
-            MediaStore.Audio.Media.GENRE
+            MediaStore.Audio.Media.GENRE,
+            MediaStore.Audio.Media.ALBUM_ARTIST
         )
 
         // Show only videos that are at least 5 minutes in duration.
@@ -78,6 +82,7 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
             val bookmarkColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.BOOKMARK)
             val composerColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
             val genreColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE)
+            val albumArtistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ARTIST)
 
             while (cursor.moveToNext()) {
                 // Get info of audio
@@ -88,6 +93,8 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
                 val bookmark = cursor.getLong(bookmarkColumn)
                 val composer = cursor.getString(composerColumn)
                 val genre = cursor.getString(genreColumn)
+                val albumArtist = cursor.getString(albumArtistColumn)
+
                 val contentUri: Uri = ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     id
@@ -103,17 +110,32 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
                         "AUTHOR: " + composer
                 )
 
-                var authorId: Long? = getOrAddPerson(composer)
-                var narratorId: Long? = getOrAddPerson(artist)
+                var authorId: Long?
+                var narratorId: Long?
+                if (composer == null) {
+                    if (albumArtistColumn == null){
+                        // Fallback to album artist
+                        authorId = getOrAddPerson("No author")
+                    } else {
+                        authorId = getOrAddPerson(albumArtist)
+                    }
 
-
+                } else {
+                    authorId = getOrAddPerson(composer)
+                }
+                if (artist == null) {
+                    narratorId = getOrAddPerson("No narrator")
+                } else {
+                    narratorId = getOrAddPerson(artist)
+                }
                 // Check if author/narrator is already in database, if not add them
                 // you can call stuff in sync here, because the importer itself is in seperate thread
 
-
+                val coverUri = extractAndGetOrSaveCover(contentUri, ContentUris.parseId(contentUri))
                 //TODO: Dont use placeholders and reconsider using long
                 audioList += Audiobook(
                     uri = contentUri.toString(),
+                    coverUri = coverUri.toString(),
                     title = title,
                     duration = duration,
                     authorId = authorId,
@@ -121,8 +143,8 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
                     position = bookmark
                 )
 
-                var genreId: Long = getOrAddGenre(genre)
-                var audiobookId: Long = getOrAddAudiobook(audioList[audioList.size-1])
+                val genreId: Long = getOrAddGenre(genre)
+                val audiobookId: Long = getOrAddAudiobook(audioList[audioList.size-1])
 
                 database.belongsToDao().insertSync(BelongsTo(audiobookId, genreId))
 
@@ -158,5 +180,23 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
         } else {
             return database.audiobookDao().insertSync(audiobook)
         }
+    }
+
+    private fun extractAndGetOrSaveCover(audiobookUri: Uri, id: Long): Uri {
+        val file = File(context.filesDir, id.toString())
+        if (file.exists()) {
+            return file.toUri()
+        }
+        val mmr = MediaMetadataRetriever()
+        mmr.setDataSource(context, audiobookUri)
+        /*context.openFileOutput(id.toString(), Context.MODE_PRIVATE).use {
+            it.write(mmr.embeddedPicture)
+        }*/
+        val cover = mmr.embeddedPicture
+        if (cover != null) {
+            file.writeBytes(mmr.embeddedPicture!!)
+            return file.toUri()
+        }
+        return "".toUri()
     }
 }

@@ -32,4 +32,7 @@ interface GenreDao {
 
     @Query("DELETE FROM genre")
     suspend fun deleteAll()
+
+    @Query("SELECT genre.* FROM genre JOIN belongsto ON genre.genreId = belongsto.genreId JOIN audiobook ON audiobook.audiobookId = belongsto.audiobookId WHERE audiobook.audiobookId = :audiobookId")
+    fun getGenresOf(audiobookId: Long): Flow<List<Genre>>
 }

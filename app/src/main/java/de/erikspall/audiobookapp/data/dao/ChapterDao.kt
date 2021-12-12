@@ -34,6 +34,6 @@ interface ChapterDao {
     @Query("SELECT EXISTS(SELECT * FROM chapter WHERE title = :title AND start = :start AND start_time = :start_time AND end = :end AND end_time = :end_time COLLATE NOCASE)")
     fun chapterExistsSync(title: String, start: Double, start_time: String, end: Double, end_time: String): Boolean
 
-    @Query("SELECT * FROM chapter WHERE chapter.audiobookId = :audiobookId")
+    @Query("SELECT * FROM chapter WHERE chapter.audiobookId = :audiobookId ORDER BY chapter.start ASC")
     suspend fun getChaptersOfAudiobook(audiobookId: Long): List<Chapter>
 }

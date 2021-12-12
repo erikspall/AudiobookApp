@@ -2,10 +2,7 @@ package de.erikspall.audiobookapp.data.repository
 
 import androidx.annotation.WorkerThread
 import de.erikspall.audiobookapp.data.dao.*
-import de.erikspall.audiobookapp.data.model.Audiobook
-import de.erikspall.audiobookapp.data.model.Chapter
-import de.erikspall.audiobookapp.data.model.Genre
-import de.erikspall.audiobookapp.data.model.Person
+import de.erikspall.audiobookapp.data.model.*
 import kotlinx.coroutines.flow.Flow
 
 class DatabaseRepository(
@@ -18,6 +15,7 @@ class DatabaseRepository(
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     val allAudiobooks: Flow<List<Audiobook>> = audiobookDao.getAudiobooks()
+    val allAudiobooksWithAuthor: Flow<List<AudiobookWithAuthor>> = audiobookDao.getAudiobooksWithAuthor()
     val allGenres: Flow<List<Genre>> = genreDao.getItems()
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to

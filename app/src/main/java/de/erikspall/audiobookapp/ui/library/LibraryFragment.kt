@@ -26,7 +26,6 @@ import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
 import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.data.handling.import.Importer
-import de.erikspall.audiobookapp.data.model.Audiobook
 import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModel
 import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModelFactory
 import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
@@ -66,7 +65,7 @@ class LibraryFragment : Fragment() {
 
         binding.libraryRecyclerView.adapter = adapter
 
-        databaseViewModel.allAudiobooks.observe(viewLifecycleOwner) {audiobooks ->
+        databaseViewModel.allAudiobooksWithAuthor.observe(viewLifecycleOwner) {audiobooks ->
             audiobooks.let { adapter.submitList(it) }
         }
 
@@ -150,9 +149,9 @@ class LibraryFragment : Fragment() {
                             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_MEDIA_LOCATION), 0)
                         }
                     }
-                    var test: List<Audiobook> = listOf()
+
                     databaseViewModel.viewModelScope.launch {
-                         test = Importer.createLocalImporter(requireContext()).getAllAsync()
+                        Importer.createLocalImporter(requireContext()).getAllAsync()
 
                         Toast.makeText(requireContext(), "Finished", Toast.LENGTH_LONG).show()
                     }
@@ -244,7 +243,7 @@ class LibraryFragment : Fragment() {
         }
         val adapter = AudioBookCardAdapter(this.requireContext(), layoutToUse)
         binding.libraryRecyclerView.adapter = adapter
-        databaseViewModel.allAudiobooks.observe(viewLifecycleOwner) {audiobooks ->
+        databaseViewModel.allAudiobooksWithAuthor.observe(viewLifecycleOwner) {audiobooks ->
             audiobooks.let { adapter.submitList(it) }
         }
     }

@@ -3,6 +3,7 @@ package de.erikspall.audiobookapp.data.viewmodels
 import android.util.Log
 import androidx.lifecycle.*
 import de.erikspall.audiobookapp.data.model.Audiobook
+import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
 import de.erikspall.audiobookapp.data.model.Genre
 import de.erikspall.audiobookapp.data.model.Person
 import de.erikspall.audiobookapp.data.repository.DatabaseRepository
@@ -17,6 +18,7 @@ class DatabaseViewModel(
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     val allAudiobooks: LiveData<List<Audiobook>> = repository.allAudiobooks.asLiveData()
+    val allAudiobooksWithAuthor: LiveData<List<AudiobookWithAuthor>> = repository.allAudiobooksWithAuthor.asLiveData()
     //TODO: Do I really need them?:
     val allGenres: LiveData<List<Genre>> = repository.allGenres.asLiveData()
 
