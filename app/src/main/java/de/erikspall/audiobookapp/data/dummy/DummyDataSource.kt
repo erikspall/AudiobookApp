@@ -3,11 +3,32 @@ package de.erikspall.audiobookapp.data.dummy
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.data.dummy.model.DummyAttribute
 import de.erikspall.audiobookapp.data.dummy.model.DummyAudiobook
+import de.erikspall.audiobookapp.data.model.Audiobook
+import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
+import de.erikspall.audiobookapp.data.model.Person
 
 /**
  * An object to generate a dummy list of Audiobooks for testing purpose
  */
 object DummyDataSource {
+    val DUMMY_AUDIOBOOKSFORMEDIASESSION: List<AudiobookWithAuthor> = listOf(
+        AudiobookWithAuthor(
+            audiobook = Audiobook(
+                0,
+                "content://media/external/audio/media/7290",
+                "file:///data/user/0/de.erikspall.audiobookapp/files/7290",
+                "Känguru Chroniken",
+                1,
+                1,
+                1,
+                1
+            ),
+            author = Person(
+                firstName = "Mark-Uwe",
+                lastName = "Kling"
+            )
+        )
+    )
     val DUMMY_AUDIOBOOKS: List<DummyAudiobook> = listOf(
         DummyAudiobook(
             R.drawable.k1,

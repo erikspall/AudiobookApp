@@ -34,7 +34,7 @@ abstract class AudiobookRoomDatabase: RoomDatabase() {
              */
             return INSTANCE ?: synchronized(this) {
 
-                context.applicationContext.deleteDatabase("audiobook_database") //TODO: REMOVE BEFORE RELEASE
+                //context.applicationContext.deleteDatabase("audiobook_database") //TODO: REMOVE BEFORE RELEASE
 
                 val instance = Room.databaseBuilder(
                     context.applicationContext,

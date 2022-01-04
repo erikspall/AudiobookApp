@@ -22,6 +22,5 @@ class AudioBookApp : Application() {
     override fun onCreate() {
         super.onCreate()
         DynamicColors.applyToActivitiesIfAvailable(this)
-
     }
 }

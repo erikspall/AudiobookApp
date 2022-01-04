@@ -1,8 +1,12 @@
 package de.erikspall.audiobookapp.ui.library
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -17,10 +21,17 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaMetadata
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.chip.Chip
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 import de.erikspall.audiobookapp.AudioBookApp
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
@@ -29,18 +40,30 @@ import de.erikspall.audiobookapp.data.handling.import.Importer
 import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModel
 import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModelFactory
 import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
+import de.erikspall.audiobookapp.uamp.PlaybackService
 import de.erikspall.audiobookapp.ui.bottom_sheets.ModalBottomSheet
 import de.erikspall.audiobookapp.utils.Conversion
 import kotlinx.coroutines.launch
 
+@androidx.media3.common.util.UnstableApi
 class LibraryFragment : Fragment() {
-
+    //private lateinit var browserFuture: ListenableFuture<MediaBrowser>
+   // private val browser: MediaBrowser?
+    //    get() = if (browserFuture.isDone) browserFuture.get() else null
+    //private val treePathStack: ArrayDeque<MediaItem> = ArrayDeque()
 
     private var _binding: FragmentLibraryBinding? = null
     private var isGridLayout = true
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    //TODO: JUST TESTING
+    private lateinit var controllerFuture: ListenableFuture<MediaController>
+    private val controller: MediaController?
+        get() = if (controllerFuture.isDone) controllerFuture.get() else null
 
     private val databaseViewModel: DatabaseViewModel by activityViewModels {
         DatabaseViewModelFactory(
@@ -78,6 +101,8 @@ class LibraryFragment : Fragment() {
 
 
 
+
+
         // Prevent mini player from being under nav bar
         ViewCompat.setOnApplyWindowInsetsListener(binding.miniPlayer.container) { view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -111,8 +136,10 @@ class LibraryFragment : Fragment() {
         binding.libraryToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.menu_search -> {
-                    Toast.makeText(requireContext(), "Search!", Toast.LENGTH_SHORT).show()
-
+                    databaseViewModel.viewModelScope.launch {
+                        //initializeBrowser()
+                    }
+                    initializeController()
                     true
                 }
                 R.id.menu_add -> {
@@ -229,7 +256,16 @@ class LibraryFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
+        binding.miniPlayer.playButton.setOnClickListener {
+            if (controller != null) {
+                if (controller!!.isPlaying)
+                    controller!!.pause()
+                else {
+                    controller!!.play()
+                    updatePlaybackProgress()
+                }
+            }
+        }
     }
 
     private fun chooseLayout() {
@@ -270,6 +306,109 @@ class LibraryFragment : Fragment() {
         _binding = null
     }
 
+    private fun initializeController() {
+        controllerFuture = MediaController.Builder(
+            requireContext(),
+            SessionToken(requireContext(), ComponentName(requireActivity(), PlaybackService::class.java))
+        ).buildAsync()
 
+        // Listener executes when Controller is finished
+        controllerFuture.addListener(
+            { setConrtoller() },
+            MoreExecutors.directExecutor()
+        )
+    }
 
+    private fun setConrtoller() {
+        val controller = this.controller ?: return
+
+        updateMiniPlayerUI(controller.mediaMetadata)
+    }
+
+    private fun updateMiniPlayerUI(mediaMetadata: MediaMetadata) {
+        Glide.with(requireContext())
+            .load(mediaMetadata.artworkUri)
+            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            .placeholder(R.drawable.ic_image)
+            .into(binding.miniPlayer.currentBookImage)
+        binding.miniPlayer.currentBookTitle.text = mediaMetadata.albumTitle
+        binding.miniPlayer.currentBookChapter.text = mediaMetadata.title
+    }
+
+    private fun updatePlaybackProgress(): Boolean = handler.postDelayed({
+        if (controller != null) {
+            val progress = ((controller!!.currentPosition.toDouble()/controller!!.duration)*100).toInt()
+
+            //Ensure that progressbar is always visible
+            if (progress <= 1)
+                binding.miniPlayer.currentBookProgress.progress = 1
+            else
+                binding.miniPlayer.currentBookProgress.progress = progress
+
+            Log.d("Progress", "$progress%")
+            Log.d("PlayerStats", "CurrentPos: " + (controller!!.currentPosition).toString() + "ms")
+            Log.d("PlayerStats", "Duration: " + (controller!!.duration).toString() + "ms")
+            if (controller!!.isPlaying) {
+                updatePlaybackProgress()
+            }
+        }
+    }, 1000)
+
+    /* // TESTING
+     private fun initializeBrowser() {
+         browserFuture =
+             MediaBrowser.Builder(
+                 requireContext(),
+                 SessionToken(requireContext(), ComponentName(requireActivity(), PlaybackService::class.java))
+             )
+                 .buildAsync()
+         browserFuture.addListener({ pushRoot() }, MoreExecutors.directExecutor())
+     }
+
+     private fun releaseBrowser() {
+         MediaBrowser.releaseFuture(browserFuture)
+     }
+
+     private fun pushRoot() {
+         // browser can be initialized many times
+         // only push root at the first initialization
+         if (!treePathStack.isEmpty()) {
+             return
+         }
+         val browser = this.browser ?: return
+         val rootFuture = browser.getLibraryRoot(/* params= */ null)
+         rootFuture.addListener(
+             {
+                 val result: LibraryResult<MediaItem> = rootFuture.get()!!
+                 val root: MediaItem = result.value!!
+                 pushPathStack(root)
+             },
+             MoreExecutors.directExecutor()
+         )
+     }
+
+     override fun onStart() {
+         super.onStart()
+         initializeController()
+     }
+
+     private fun initializeController() {
+         controllerFuture =
+             MediaController.Builder(
+                 requireContext(),
+                 SessionToken(requireContext(), ComponentName(requireContext(), PlaybackService::class.java))
+             )
+                 .buildAsync()
+         controllerFuture.addListener({ setConrtoller() }, MoreExecutors.directExecutor())
+     }
+
+     private fun setConrtoller() {
+         val controller = this.controller ?: return
+
+     }
+
+     private fun pushPathStack(mediaItem: MediaItem) {
+         treePathStack.addLast(mediaItem)
+         //displayChildrenList(treePathStack.last())
+     }*/
 }

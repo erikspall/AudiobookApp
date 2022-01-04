@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.erikspall.audiobookapp">
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <application
         android:name="de.erikspall.audiobookapp.AudioBookApp"
         android:allowBackup="true"
@@ -11,6 +13,7 @@
         android:supportsRtl="true"
         android:windowSoftInputMode="adjustPan"
         android:theme="@style/Theme.AudiobookApp">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -22,8 +25,16 @@
             </intent-filter>
 
         </activity>
-
+        <service
+            android:name="de.erikspall.audiobookapp.uamp.PlaybackService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService"/>
+                <action android:name="android.media.browse.MediaBrowserService"/>
+            </intent-filter>
+        </service>
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
+
+
+
 </manifest>

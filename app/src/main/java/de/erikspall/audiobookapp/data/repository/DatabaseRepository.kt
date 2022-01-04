@@ -16,6 +16,7 @@ class DatabaseRepository(
     // Observed Flow will notify the observer when the data has changed.
     val allAudiobooks: Flow<List<Audiobook>> = audiobookDao.getAudiobooks()
     val allAudiobooksWithAuthor: Flow<List<AudiobookWithAuthor>> = audiobookDao.getAudiobooksWithAuthor()
+    val allAudiobooksWithInfo: Flow<List<AudiobookWithInfo>> = audiobookDao.getAudiobooksWithInfo()
     val allGenres: Flow<List<Genre>> = genreDao.getItems()
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to

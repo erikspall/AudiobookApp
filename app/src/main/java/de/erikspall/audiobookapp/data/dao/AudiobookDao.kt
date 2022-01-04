@@ -4,6 +4,7 @@ import androidx.room.*
 import de.erikspall.audiobookapp.data.model.Audiobook
 import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
 import de.erikspall.audiobookapp.data.model.AudiobookWithChapters
+import de.erikspall.audiobookapp.data.model.AudiobookWithInfo
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -44,4 +45,16 @@ interface AudiobookDao {
     @Transaction
     @Query("SELECT * FROM audiobook")
     fun getAudiobooksWithAuthor(): Flow<List<AudiobookWithAuthor>>
+
+    @Transaction
+    @Query("SELECT * FROM audiobook")
+    fun getAudiobooksWithAuthorSync(): List<AudiobookWithAuthor>
+
+    @Transaction
+    @Query("SELECT * FROM audiobook")
+    fun getAudiobooksWithInfo(): Flow<List<AudiobookWithInfo>>
+
+    @Transaction
+    @Query("SELECT * FROM audiobook")
+    fun getAudiobooksWithInfoSync(): List<AudiobookWithInfo>
 }

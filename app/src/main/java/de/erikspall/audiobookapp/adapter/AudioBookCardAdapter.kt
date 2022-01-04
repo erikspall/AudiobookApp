@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.const.Layout
@@ -39,7 +40,7 @@ class AudioBookCardAdapter (
         val book_title: TextView = view!!.findViewById(R.id.book_title)
         val book_progress: TextView = view!!.findViewById(R.id.book_progress)
         val book_progress_indicator: LinearProgressIndicator = view!!.findViewById(R.id.book_progress_indicator)
-
+        val playButton: FloatingActionButton = view.findViewById(R.id.play_button)
 
         override fun bind(audiobookWithAuthor: AudiobookWithAuthor, context: Context?) {
             Glide.with(context!!)
@@ -50,6 +51,8 @@ class AudioBookCardAdapter (
             book_title.text = audiobookWithAuthor.audiobook.title
             book_progress.text = context?.resources?.getString(R.string.progress_text_view, ((audiobookWithAuthor.audiobook.position / audiobookWithAuthor.audiobook.duration)*100.0).roundToInt().toString())
             book_progress_indicator.setProgress(((audiobookWithAuthor.audiobook.position / audiobookWithAuthor.audiobook.duration)*100.0).roundToInt(), false)
+
+
         }
 
         companion object {
@@ -114,41 +117,6 @@ class AudioBookCardAdapter (
 
         val current = getItem(position)
         holder.bind(current, context)
-
-        /*val resources = context?.resources
-        val item = data[position]
-
-
-
-        // Shared among both layouts
-
-        val authors = item.chipAttributes[DummyAttribute.AUTHOR]
-
-        when (layout) {
-            Layout.LIST -> { // If it's list
-                holder as ListViewHolder
-
-
-
-                holder.book_image.setImageResource(item.imageResourceId)
-                holder.book_title.text = item.title
-                holder.book_progress.text = resources?.getString(R.string.progress_text_view_simple, item.progress.toString())
-                holder.book_duration.text = "00:00:00" // TODO: Obviously
-                if (authors != null)
-                    holder.book_author.text = authors[0] // only display first
-
-            }
-            else -> { // Grid
-                holder as GridCardViewHolder
-
-                holder.book_image.setImageResource(item.imageResourceId)
-                holder.book_title.text = item.title
-                holder.book_progress.text = resources?.getString(R.string.progress_text_view, item.progress.toString())
-                holder.book_progress_indicator.setProgress(item.progress, false)
-
-            }
-        }*/
-
 
     }
     companion object {
