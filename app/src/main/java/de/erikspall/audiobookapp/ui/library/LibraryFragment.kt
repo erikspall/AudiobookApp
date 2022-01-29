@@ -16,12 +16,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaMetadata
+import androidx.media3.session.MediaBrowser
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation.findNavController
@@ -43,20 +43,18 @@ import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
 import de.erikspall.audiobookapp.uamp.PlaybackService
 import de.erikspall.audiobookapp.ui.bottom_sheets.ModalBottomSheet
 import de.erikspall.audiobookapp.utils.Conversion
+import de.erikspall.audiobookapp.viewmodels.AppViewModel
 import kotlinx.coroutines.launch
 
 @androidx.media3.common.util.UnstableApi
 class LibraryFragment : Fragment() {
-    //private lateinit var browserFuture: ListenableFuture<MediaBrowser>
-   // private val browser: MediaBrowser?
-    //    get() = if (browserFuture.isDone) browserFuture.get() else null
-    //private val treePathStack: ArrayDeque<MediaItem> = ArrayDeque()
-
     private var _binding: FragmentLibraryBinding? = null
-    private var isGridLayout = true
+    //private var isGridLayout = true
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private val sharedViewModel: AppViewModel by activityViewModels()
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -64,6 +62,9 @@ class LibraryFragment : Fragment() {
     private lateinit var controllerFuture: ListenableFuture<MediaController>
     private val controller: MediaController?
         get() = if (controllerFuture.isDone) controllerFuture.get() else null
+    private lateinit var browserFuture: ListenableFuture<MediaBrowser>
+    private val browser: MediaBrowser?
+        get() = if (browserFuture.isDone) browserFuture.get() else null
 
     private val databaseViewModel: DatabaseViewModel by activityViewModels {
         DatabaseViewModelFactory(
@@ -81,22 +82,22 @@ class LibraryFragment : Fragment() {
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val adapter = AudioBookCardAdapter(
-            this.requireContext(),
-            Layout.GRID // Use Grid as standard
-        )
 
-        binding.libraryRecyclerView.adapter = adapter
+        initializeBrowser()
+        //TODO: Das unten funktionert wenigstens...
 
-        databaseViewModel.allAudiobooksWithAuthor.observe(viewLifecycleOwner) {audiobooks ->
-            audiobooks.let { adapter.submitList(it) }
-        }
+        Log.d("FragmentStuff", "LibraryFragment created/re-created!")
+        Log.d("FragmentStuff", "<!-- Values here -->")
+
+        chooseLayout()
+
+
 
         //TODO: Check if something was played and show card view
         binding.miniPlayer.container.setOnClickListener {
             val action = LibraryFragmentDirections.actionLibraryFragmentToNowPlayingFragment()
             binding.miniPlayer.container.findNavController().navigate(action)
-            binding.miniPlayer.container.isVisible = false
+            //binding.miniPlayer.container.isVisible = false
         }
 
 
@@ -130,7 +131,6 @@ class LibraryFragment : Fragment() {
         chip.text = "Mark-Uwe-Kling"
         chip.isCheckable = true
         chip.isClickable = true
-
         binding.libraryChipGroup.addView(chip)
 
         binding.libraryToolbar.setOnMenuItemClickListener { menuItem ->
@@ -148,7 +148,10 @@ class LibraryFragment : Fragment() {
                     true
                 }
                 R.id.menu_switch_layout -> {
-                    isGridLayout = !isGridLayout
+                    if (sharedViewModel.layout == Layout.GRID)
+                        sharedViewModel.layout = Layout.LIST
+                    else
+                        sharedViewModel.layout = Layout.GRID
                     // Sets layout and icon
                     chooseLayout()
                     setIconAndTitle(menuItem)
@@ -192,17 +195,6 @@ class LibraryFragment : Fragment() {
             }
         }
 
-/*
-        binding.libraryToolbar.setNavigationOnClickListener {
-            Toast.makeText(requireContext(), "Exit search", Toast.LENGTH_LONG).show()
-            leaveSearchState()
-        }
-*/
-
-
-
-
-
                 // This is a workaround for a bug. CollapsingToolbar layout is consuming the insets and not
                 // passing them to child. DO NOT REMOVE
                 ViewCompat.setOnApplyWindowInsetsListener(binding.libraryCollapsingtoolbarlayout){ view, windowInsets ->
@@ -231,31 +223,14 @@ class LibraryFragment : Fragment() {
                     WindowInsetsCompat.CONSUMED
                 }
 
-
-        /*ViewCompat.setOnApplyWindowInsetsListener(binding.libraryRecyclerView) { view, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // Apply the insets as a margin to the view. Here the system is setting
-            // only the bottom, left, and right dimensions, but apply whichever insets are
-            // appropriate to your layout. You can also update the view padding
-            // if that's more appropriate.
-
-            view.updateLayoutParams<ViewGroup.MarginLayoutParams>{
-
-                bottomMargin = insets.bottom + Conversion.pxToDp(binding.miniPlayer.container.height)
-            }
-
-            // Return CONSUMED if you don't want want the window insets to keep being
-            // passed down to descendant views.
-            WindowInsetsCompat.CONSUMED
-        }*/
-
-
-
         return root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        initializeController()
+
         binding.miniPlayer.playButton.setOnClickListener {
             if (controller != null) {
                 if (controller!!.isPlaying)
@@ -269,15 +244,13 @@ class LibraryFragment : Fragment() {
     }
 
     private fun chooseLayout() {
-        var layoutToUse = Layout.GRID
-
-        if (isGridLayout) {
+        if (sharedViewModel.layout == Layout.GRID)
             binding.libraryRecyclerView.layoutManager = GridLayoutManager(this.requireContext(), 2)
-        } else {
+         else
             binding.libraryRecyclerView.layoutManager = LinearLayoutManager(this.requireContext())
-            layoutToUse = Layout.LIST
-        }
-        val adapter = AudioBookCardAdapter(this.requireContext(), layoutToUse)
+
+        val adapter = AudioBookCardAdapter(this.requireContext(), this.requireActivity(), sharedViewModel.layout)
+
         binding.libraryRecyclerView.adapter = adapter
         databaseViewModel.allAudiobooksWithAuthor.observe(viewLifecycleOwner) {audiobooks ->
             audiobooks.let { adapter.submitList(it) }
@@ -291,12 +264,12 @@ class LibraryFragment : Fragment() {
             return
 
         menuItem.icon =
-            if (isGridLayout)
+            if (sharedViewModel.layout == Layout.GRID)
                 ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_list)
             else ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_grid)
 
         menuItem.title =
-            if (isGridLayout)
+            if (sharedViewModel.layout == Layout.GRID)
                 getString(R.string.menu_switch_layout_list)
             else getString(R.string.menu_switch_layout_grid)
     }
@@ -304,6 +277,8 @@ class LibraryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        releaseBrowser()
+        releaseController()
     }
 
     private fun initializeController() {
@@ -323,6 +298,34 @@ class LibraryFragment : Fragment() {
         val controller = this.controller ?: return
 
         updateMiniPlayerUI(controller.mediaMetadata)
+    }
+
+    private fun initializeBrowser() {
+        browserFuture =
+            MediaBrowser.Builder(
+                requireContext(),
+                SessionToken(requireContext(), ComponentName(requireActivity(), PlaybackService::class.java))
+            )
+                .buildAsync()
+        browserFuture.addListener({ setBrowser() }, MoreExecutors.directExecutor())
+    }
+
+    private fun setBrowser() {
+        // browser can be initialized many times
+        // only push root at the first initialization
+        //if (!treePathStack.isEmpty()) {
+        //    return
+        //}
+        val browser = this.browser ?: return
+
+    }
+
+    private fun releaseBrowser() {
+        MediaBrowser.releaseFuture(browserFuture)
+    }
+
+    private fun releaseController() {
+        MediaController.releaseFuture(controllerFuture)
     }
 
     private fun updateMiniPlayerUI(mediaMetadata: MediaMetadata) {
@@ -354,61 +357,9 @@ class LibraryFragment : Fragment() {
         }
     }, 1000)
 
-    /* // TESTING
-     private fun initializeBrowser() {
-         browserFuture =
-             MediaBrowser.Builder(
-                 requireContext(),
-                 SessionToken(requireContext(), ComponentName(requireActivity(), PlaybackService::class.java))
-             )
-                 .buildAsync()
-         browserFuture.addListener({ pushRoot() }, MoreExecutors.directExecutor())
-     }
 
-     private fun releaseBrowser() {
-         MediaBrowser.releaseFuture(browserFuture)
-     }
-
-     private fun pushRoot() {
-         // browser can be initialized many times
-         // only push root at the first initialization
-         if (!treePathStack.isEmpty()) {
-             return
-         }
-         val browser = this.browser ?: return
-         val rootFuture = browser.getLibraryRoot(/* params= */ null)
-         rootFuture.addListener(
-             {
-                 val result: LibraryResult<MediaItem> = rootFuture.get()!!
-                 val root: MediaItem = result.value!!
-                 pushPathStack(root)
-             },
-             MoreExecutors.directExecutor()
-         )
-     }
-
-     override fun onStart() {
-         super.onStart()
-         initializeController()
-     }
-
-     private fun initializeController() {
-         controllerFuture =
-             MediaController.Builder(
-                 requireContext(),
-                 SessionToken(requireContext(), ComponentName(requireContext(), PlaybackService::class.java))
-             )
-                 .buildAsync()
-         controllerFuture.addListener({ setConrtoller() }, MoreExecutors.directExecutor())
-     }
-
-     private fun setConrtoller() {
-         val controller = this.controller ?: return
-
-     }
-
-     private fun pushPathStack(mediaItem: MediaItem) {
-         treePathStack.addLast(mediaItem)
-         //displayChildrenList(treePathStack.last())
-     }*/
+    override fun onDetach() {
+        super.onDetach()
+        Log.d("FragmentStuff", "LibraryFragment destroyed!")
+    }
 }

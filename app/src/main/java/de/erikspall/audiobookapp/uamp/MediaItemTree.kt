@@ -139,7 +139,7 @@ object MediaItemTree {
                 )
             )
 
-        titleMap[title.lowercase()] = treeNodes[idInTree]!!
+        titleMap[title] = treeNodes[idInTree]!!
 
         if (!treeNodes.containsKey(bookFolderIdInTree)) {
             treeNodes[bookFolderIdInTree] =
@@ -182,4 +182,5 @@ object MediaItemTree {
     fun getItemFromTitle(title: String): MediaItem? {
         return titleMap[title]?.item
     }
+
 }
