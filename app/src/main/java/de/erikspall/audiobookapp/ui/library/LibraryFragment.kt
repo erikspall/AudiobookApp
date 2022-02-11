@@ -1,7 +1,6 @@
 package de.erikspall.audiobookapp.ui.library
 
 import android.Manifest
-import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -23,7 +22,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaBrowser
 import androidx.media3.session.MediaController
-import androidx.media3.session.SessionToken
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,16 +29,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.chip.Chip
 import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.util.concurrent.MoreExecutors
 import de.erikspall.audiobookapp.AudioBookApp
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
 import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.data.handling.import.Importer
+import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
 import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModel
 import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModelFactory
 import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
-import de.erikspall.audiobookapp.uamp.PlaybackService
 import de.erikspall.audiobookapp.ui.bottom_sheets.ModalBottomSheet
 import de.erikspall.audiobookapp.utils.Conversion
 import de.erikspall.audiobookapp.viewmodels.AppViewModel
@@ -83,7 +80,7 @@ class LibraryFragment : Fragment() {
         val root: View = binding.root
 
 
-        initializeBrowser()
+
         //TODO: Das unten funktionert wenigstens...
 
         Log.d("FragmentStuff", "LibraryFragment created/re-created!")
@@ -136,10 +133,6 @@ class LibraryFragment : Fragment() {
         binding.libraryToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.menu_search -> {
-                    databaseViewModel.viewModelScope.launch {
-                        //initializeBrowser()
-                    }
-                    initializeController()
                     true
                 }
                 R.id.menu_add -> {
@@ -182,7 +175,6 @@ class LibraryFragment : Fragment() {
 
                     databaseViewModel.viewModelScope.launch {
                         Importer.createLocalImporter(requireContext()).getAllAsync()
-
                         Toast.makeText(requireContext(), "Finished", Toast.LENGTH_LONG).show()
                     }
 
@@ -228,18 +220,15 @@ class LibraryFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        initializeController()
-
         binding.miniPlayer.playButton.setOnClickListener {
-            if (controller != null) {
-                if (controller!!.isPlaying)
-                    controller!!.pause()
+
+                if (sharedViewModel.controller!!.isPlaying)
+                    sharedViewModel.controller!!.pause()
                 else {
-                    controller!!.play()
+                    sharedViewModel.controller!!.play()
                     updatePlaybackProgress()
                 }
-            }
+
         }
     }
 
@@ -249,7 +238,7 @@ class LibraryFragment : Fragment() {
          else
             binding.libraryRecyclerView.layoutManager = LinearLayoutManager(this.requireContext())
 
-        val adapter = AudioBookCardAdapter(this.requireContext(), this.requireActivity(), sharedViewModel.layout)
+        val adapter = AudioBookCardAdapter(this.requireContext(), ::startPlayback, sharedViewModel.layout)
 
         binding.libraryRecyclerView.adapter = adapter
         databaseViewModel.allAudiobooksWithAuthor.observe(viewLifecycleOwner) {audiobooks ->
@@ -277,57 +266,12 @@ class LibraryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        releaseBrowser()
-        releaseController()
     }
-
-    private fun initializeController() {
-        controllerFuture = MediaController.Builder(
-            requireContext(),
-            SessionToken(requireContext(), ComponentName(requireActivity(), PlaybackService::class.java))
-        ).buildAsync()
-
-        // Listener executes when Controller is finished
-        controllerFuture.addListener(
-            { setConrtoller() },
-            MoreExecutors.directExecutor()
-        )
+    private fun startPlayback(audiobookWithAuthor: AudiobookWithAuthor){
+        sharedViewModel.playMedia(audiobookWithAuthor)
+        updateMiniPlayerUI(sharedViewModel.controller!!.currentMediaItem!!.mediaMetadata)
+        updatePlaybackProgress()
     }
-
-    private fun setConrtoller() {
-        val controller = this.controller ?: return
-
-        updateMiniPlayerUI(controller.mediaMetadata)
-    }
-
-    private fun initializeBrowser() {
-        browserFuture =
-            MediaBrowser.Builder(
-                requireContext(),
-                SessionToken(requireContext(), ComponentName(requireActivity(), PlaybackService::class.java))
-            )
-                .buildAsync()
-        browserFuture.addListener({ setBrowser() }, MoreExecutors.directExecutor())
-    }
-
-    private fun setBrowser() {
-        // browser can be initialized many times
-        // only push root at the first initialization
-        //if (!treePathStack.isEmpty()) {
-        //    return
-        //}
-        val browser = this.browser ?: return
-
-    }
-
-    private fun releaseBrowser() {
-        MediaBrowser.releaseFuture(browserFuture)
-    }
-
-    private fun releaseController() {
-        MediaController.releaseFuture(controllerFuture)
-    }
-
     private fun updateMiniPlayerUI(mediaMetadata: MediaMetadata) {
         Glide.with(requireContext())
             .load(mediaMetadata.artworkUri)
@@ -339,9 +283,8 @@ class LibraryFragment : Fragment() {
     }
 
     private fun updatePlaybackProgress(): Boolean = handler.postDelayed({
-        if (controller != null) {
-            val progress = ((controller!!.currentPosition.toDouble()/controller!!.duration)*100).toInt()
 
+            val progress = sharedViewModel.getPositionInPercentage()
             //Ensure that progressbar is always visible
             if (progress <= 1)
                 binding.miniPlayer.currentBookProgress.progress = 1
@@ -349,12 +292,12 @@ class LibraryFragment : Fragment() {
                 binding.miniPlayer.currentBookProgress.progress = progress
 
             Log.d("Progress", "$progress%")
-            Log.d("PlayerStats", "CurrentPos: " + (controller!!.currentPosition).toString() + "ms")
-            Log.d("PlayerStats", "Duration: " + (controller!!.duration).toString() + "ms")
-            if (controller!!.isPlaying) {
+            Log.d("PlayerStats", "CurrentPos: " + (sharedViewModel.controller!!.currentPosition).toString() + "ms")
+            Log.d("PlayerStats", "Duration: " + (sharedViewModel.controller!!.duration).toString() + "ms")
+            if (sharedViewModel.controller!!.isPlaying) {
                 updatePlaybackProgress()
             }
-        }
+
     }, 1000)
 
 

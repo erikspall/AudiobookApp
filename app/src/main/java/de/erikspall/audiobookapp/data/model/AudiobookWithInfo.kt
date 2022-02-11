@@ -1,6 +1,7 @@
 package de.erikspall.audiobookapp.data.model
 
 import androidx.room.Embedded
+import androidx.room.Junction
 import androidx.room.Relation
 
 data class AudiobookWithInfo (
@@ -22,5 +23,12 @@ data class AudiobookWithInfo (
         parentColumn = "audiobookId", // Column in Audiobook
         entityColumn = "audiobookId" // Column in Chapter
     )
-    val chapters: List<Chapter>
+    val chapters: List<Chapter>,
+
+    @Relation(
+    parentColumn = "audiobookId",
+    entityColumn = "genreId",
+    associateBy = Junction(BelongsTo::class)
+    )
+    val genres: List<Genre>
 )

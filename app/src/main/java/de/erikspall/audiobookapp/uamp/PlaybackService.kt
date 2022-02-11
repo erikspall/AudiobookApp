@@ -140,7 +140,7 @@ class PlaybackService : MediaLibraryService() {
     private fun initializeSessionAndPlayer() {
         MainScope().launch {
             val audiobooks = withContext(Dispatchers.IO){
-                database.audiobookDao().getAudiobooksWithAuthorSync()
+                database.audiobookDao().getAudiobooksWithInfoSync()
             }
             MediaItemTree.initialize(audiobooks)
         }

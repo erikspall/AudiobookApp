@@ -1,5 +1,6 @@
 package de.erikspall.audiobookapp.ui.now_playing
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +11,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.media3.common.MediaMetadata
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentPlayerBinding
 import de.erikspall.audiobookapp.viewmodels.AppViewModel
 
@@ -40,8 +45,13 @@ class NowPlayingFragment: Fragment() {
             }
             windowInsets
         }
-
         return root
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        updateUI(sharedViewModel.getCurrentMediaItem().mediaMetadata)
     }
 
     override fun onDetach() {
@@ -54,5 +64,13 @@ class NowPlayingFragment: Fragment() {
         _binding = null
     }
 
-
+    @SuppressLint("UnsafeOptInUsageError")
+    private fun updateUI(mediaMetadata: MediaMetadata){
+        Glide.with(requireContext())
+            .load(mediaMetadata.artworkUri)
+            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            .placeholder(R.drawable.ic_image)
+            .into(binding.bookImage)
+        binding.bookName.text = mediaMetadata.albumTitle
+    }
 }
