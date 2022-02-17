@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.net.toUri
@@ -12,17 +13,14 @@ import de.erikspall.audiobookapp.data.model.Audiobook
 import de.erikspall.audiobookapp.data.model.BelongsTo
 import de.erikspall.audiobookapp.data.model.Genre
 import de.erikspall.audiobookapp.data.model.Person
-import kotlinx.coroutines.CoroutineScope
+import de.erikspall.audiobookapp.data.provider.AUTHORITY
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 import java.io.File
 
 class LocalImporter(val context: Context) : Importer<Audiobook> {
 
-    val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(context,  CoroutineScope(
-        SupervisorJob()
-    )
+    val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(context
     )}
 
 
@@ -94,7 +92,6 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
                 val composer = cursor.getString(composerColumn)
                 val genre = cursor.getString(genreColumn)
                 val albumArtist = cursor.getString(albumArtistColumn)
-
                 val contentUri: Uri = ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     id
@@ -132,6 +129,7 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
                 // you can call stuff in sync here, because the importer itself is in seperate thread
 
                 val coverUri = extractAndGetOrSaveCover(contentUri, ContentUris.parseId(contentUri))
+                Log.d("Importer", coverUri.toString())
                 //TODO: Dont use placeholders and reconsider using long
                 audioList += Audiobook(
                     uri = contentUri.toString(),
@@ -183,9 +181,10 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
     }
 
     private fun extractAndGetOrSaveCover(audiobookUri: Uri, id: Long): Uri {
-        val file = File(context.filesDir, id.toString())
+        ///val file = File(context.filesDir, "$id.cover")
+        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "$id.cover")
         if (file.exists()) {
-            return file.toUri()
+            return "content://$AUTHORITY/cover/$id".toUri()
         }
         val mmr = MediaMetadataRetriever()
         mmr.setDataSource(context, audiobookUri)
@@ -194,8 +193,9 @@ class LocalImporter(val context: Context) : Importer<Audiobook> {
         }*/
         val cover = mmr.embeddedPicture
         if (cover != null) {
-            file.writeBytes(mmr.embeddedPicture!!)
-            return file.toUri()
+            file.writeBytes(mmr.embeddedPicture ?: ByteArray(0))
+            file.setReadOnly()
+            return "content://$AUTHORITY/cover/$id".toUri()
         }
         return "".toUri()
     }

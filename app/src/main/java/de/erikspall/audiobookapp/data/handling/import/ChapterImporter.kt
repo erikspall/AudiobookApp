@@ -7,9 +7,7 @@ import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.FFprobeKit
 import de.erikspall.audiobookapp.data.database.AudiobookRoomDatabase
 import de.erikspall.audiobookapp.data.model.Chapter
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -21,9 +19,7 @@ class ChapterImporter(private val context: Context, private val contentUri: Uri,
     operator fun JSONArray.iterator(): Iterator<JSONObject>
             = (0 until length()).asSequence().map { get(it) as JSONObject }.iterator()
 
-    val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(context,  CoroutineScope(
-        SupervisorJob()
-    )
+    val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(context
     )}
 
     override fun getAll(): List<Chapter> {

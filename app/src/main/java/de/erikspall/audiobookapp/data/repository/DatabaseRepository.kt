@@ -59,4 +59,10 @@ class DatabaseRepository(
         chapterDao.insert(chapter)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    fun getAudiobookWithInfo(uri: String): AudiobookWithInfo {
+        return audiobookDao.getAudiobookWithInfo(uri)
+    }
+
 }

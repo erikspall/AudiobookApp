@@ -27,7 +27,7 @@ abstract class AudiobookRoomDatabase: RoomDatabase() {
          * Make sure only one database exists (Singleton). synchronized creation of instance
          * means, only one thread can enter that block, so only one database will be created
          */
-        fun getDatabase(context: Context, scope: CoroutineScope): AudiobookRoomDatabase {
+        fun getDatabase(context: Context): AudiobookRoomDatabase {
             /**
              * Make sure only one database exists (Singleton). synchronized creation of instance
              * means, only one thread can enter that block, so only one database will be created

@@ -1,11 +1,13 @@
 package de.erikspall.audiobookapp.uamp
 
 import android.net.Uri
+import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import androidx.media3.common.MediaMetadata.*
+import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
+import androidx.media3.common.MediaMetadata.FOLDER_TYPE_NONE
 import com.google.common.collect.ImmutableList
 import de.erikspall.audiobookapp.data.model.AudiobookWithInfo
 import de.erikspall.audiobookapp.data.model.Chapter
@@ -22,10 +24,11 @@ import de.erikspall.audiobookapp.data.model.Chapter
 @androidx.media3.common.util.UnstableApi
 object MediaItemTree {
     private var treeNodes: MutableMap<String, MediaItemNode> = mutableMapOf()
-    private var titleMap: MutableMap<String, MediaItemNode> = mutableMapOf()
+    private var bookUriMap: MutableMap<String, MediaItemNode> = mutableMapOf()
+    //private var bookMap: MutableMap<String, MediaItemNode> = mutableMapOf()
     private var isInitialized = false
     private const val ROOT_ID = "[rootID]"
-    private const val BOOK_ID = "[bookID]"
+    private const val LIB_ID = "[bookID]"
     private const val GENRE_ID = "[genreID]"
     private const val AUTHOR_ID = "[authorID]"
     private const val NARRATOR_ID = "[narratorID]"
@@ -34,6 +37,7 @@ object MediaItemTree {
     private const val AUTHOR_PREFIX = "[author]"
     private const val NARRATOR_PREFIX = "[narrator]"
     private const val ITEM_PREFIX = "[item]"
+    const val METADATA_KEY_DURATION = "1"
 
     private class MediaItemNode(val item: MediaItem) {
         private val children: MutableList<MediaItem> = ArrayList()
@@ -59,18 +63,21 @@ object MediaItemTree {
         sourceUri: Uri? = null,
         imageUri: Uri? = null,
         startPosition: Long? = null,
-        endPosition: Long? = null
+        endPosition: Long? = null,
+        duration: Bundle? = null
     ): MediaItem {
         val metadata =
             MediaMetadata.Builder()
                 .setAlbumTitle(book)
                 .setTitle(title)
-                .setArtist(author)
+                .setArtist(book) //TODO: back to author? but this way finding book is easy
                 .setComposer(narrator)
                 .setGenre(genre)
                 .setFolderType(folderType)
                 .setIsPlayable(isPlayable)
                 .setArtworkUri(imageUri)
+                .setMediaUri(sourceUri)
+                .setExtras(duration)
                 .build()
 
         MediaItem.ClippingConfiguration.Builder().setStartPositionMs(100).build()
@@ -101,19 +108,36 @@ object MediaItemTree {
                 )
             )
         // [...] skip folders
+        treeNodes[LIB_ID] =
+            MediaItemNode(
+                buildMediaItem(
+                    title = "Library Folder",
+                    mediaId = LIB_ID,
+                    isPlayable = false,
+                    folderType = FOLDER_TYPE_MIXED
+                )
+            )
+
+        treeNodes[ROOT_ID]!!.addChild(LIB_ID)
+
         for (book in mediaList){
-            val BOOK_ID = "[" + book.audiobook.audiobookId + "]"
+            val BOOK_ID = "[book]" + book.audiobook.audiobookId
+            val duration: Bundle = Bundle()
+            duration.putLong(METADATA_KEY_DURATION, book.audiobook.duration)
+
             treeNodes[BOOK_ID] =
                 MediaItemNode(
                     buildMediaItem(
                         title = book.audiobook.title,
                         mediaId = BOOK_ID,
-                        isPlayable = false,
-                        folderType = FOLDER_TYPE_MIXED
+                        isPlayable = false, //TODO: it is playable!!!
+                        folderType = FOLDER_TYPE_MIXED,
+                        duration = duration
                     )
                 )
 
-            treeNodes[ROOT_ID]!!.addChild(BOOK_ID)
+            treeNodes[LIB_ID]!!.addChild(BOOK_ID)
+            bookUriMap[book.audiobook.uri] = treeNodes[BOOK_ID]!!
 
             for (chapter in book.chapters) {
                 addNodeToTree(BOOK_ID, book, chapter)
@@ -128,25 +152,24 @@ object MediaItemTree {
 
     private fun addNodeToTree(BOOK_ID: String, audiobookWithInfo: AudiobookWithInfo, chapter: Chapter) {
         // TODO: It is probably better to pass chapters in here idk
-        val id = BOOK_ID + chapter.chapterId
+        val id = BOOK_ID + CHAPTER_PREFIX + chapter.chapterId
         val book = audiobookWithInfo.audiobook.title
-        val title = chapter.title // TODO: Title of Chapter
+        val title = chapter.title
         val author = audiobookWithInfo.author.toString()
-        val narrator = audiobookWithInfo.narrator.toString() //TODO: ...
-        val genre = audiobookWithInfo.genres[0].name ?: "No genre"
+        val narrator = audiobookWithInfo.narrator.toString()
+        val genre = audiobookWithInfo.genres[0].name ?: "No genre" //TODO: can be empty!!!
         val sourceUri = audiobookWithInfo.audiobook.uri.toUri()
         val imageUri = audiobookWithInfo.audiobook.coverUri.toUri()
-        // key of such items in tree
-        val idInTree = CHAPTER_PREFIX + id
-        val bookFolderIdInTree = BOOK_PREFIX + book
-        // Genre Author etc. here if all works
+
+        val duration: Bundle = Bundle()
+        duration.putLong(METADATA_KEY_DURATION, ((chapter.end_time.toDouble() - chapter.start_time.toDouble())*1000).toLong())
 
         // Create Folder for each Chapter and add
-        treeNodes[idInTree] =
+        treeNodes[id] =
             MediaItemNode(
                 buildMediaItem(
                     title = title,
-                    mediaId = idInTree,
+                    mediaId = id,
                     isPlayable = true,
                     book = book,
                     author = author,
@@ -156,13 +179,14 @@ object MediaItemTree {
                     imageUri = imageUri,
                     folderType = FOLDER_TYPE_NONE,
                     startPosition = (chapter.start_time.toDouble()*1000).toLong(),
-                    endPosition = (chapter.end_time.toDouble()*1000).toLong()
+                    endPosition = (chapter.end_time.toDouble()*1000).toLong(),
+                    duration = duration
                 )
             )
 
-        titleMap[title] = treeNodes[idInTree]!!
+        //titleMap[title] = treeNodes[id]!!
 
-        if (!treeNodes.containsKey(bookFolderIdInTree)) {
+        /*if (!treeNodes.containsKey(bookFolderIdInTree)) {
             treeNodes[bookFolderIdInTree] =
                 MediaItemNode(
                     buildMediaItem(
@@ -173,8 +197,8 @@ object MediaItemTree {
                     )
                 )
             treeNodes[BOOK_ID]!!.addChild(bookFolderIdInTree)
-        }
-        treeNodes[bookFolderIdInTree]!!.addChild(idInTree)
+        }*/
+        treeNodes[BOOK_ID]!!.addChild(id)
     }
 
     fun getItem(id: String): MediaItem? {
@@ -199,7 +223,28 @@ object MediaItemTree {
     }
 
     fun getItemFromTitle(title: String): MediaItem? {
-        return titleMap[title]?.item
+        return MediaItem.EMPTY
+    }
+
+    /**
+     * Useful to get Book Media Item of chapter
+     * @param uri - A String representing the media URI
+     * @return The MediaItem with this uri, returns MediaItem.EMPTY if no MediaItem with this URI
+     * was found
+     */
+    fun getItemFromUri(uri: String): MediaItem {
+        return bookUriMap[uri]?.item ?: MediaItem.EMPTY
+    }
+
+    /**
+     * Useful to get Book Media Item of chapter
+     * @param bookId - An Int representing the unique audiobookId in the Room database
+     * @return List of MediaItems representing chapters if bookId
+     */
+    fun getChaptersOfBook(bookId: Long): List<MediaItem> {
+        if (!treeNodes.containsKey(BOOK_PREFIX + bookId))
+            return emptyList()
+        return treeNodes[BOOK_PREFIX + bookId]!!.getChildren()
     }
 
 }

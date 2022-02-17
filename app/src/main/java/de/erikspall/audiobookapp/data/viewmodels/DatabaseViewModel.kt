@@ -37,6 +37,10 @@ class DatabaseViewModel(
         Log.d("Hey", "Im doin someting")
     }
 
+    fun getAudiobookWithInfo(uri: String): AudiobookWithInfo{
+        return repository.getAudiobookWithInfo(uri)
+    }
+
 }
 
 class DatabaseViewModelFactory(

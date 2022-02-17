@@ -33,6 +33,12 @@
                 <action android:name="android.media.browse.MediaBrowserService"/>
             </intent-filter>
         </service>
+
+        <provider
+            android:authorities="de.erikspall.audiobookapp.data.provider.CoverProvider"
+            android:name="de.erikspall.audiobookapp.data.provider.CoverProvider"
+            android:grantUriPermissions="true"
+            android:exported="true"/>
     </application>
 
 

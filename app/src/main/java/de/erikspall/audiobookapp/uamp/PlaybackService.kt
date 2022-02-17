@@ -19,16 +19,17 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import de.erikspall.audiobookapp.MainActivity
 import de.erikspall.audiobookapp.data.database.AudiobookRoomDatabase
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @androidx.media3.common.util.UnstableApi
 class PlaybackService : MediaLibraryService() {
     private lateinit var player: ExoPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
     private val librarySessionCallback = CustomMediaLibrarySessionCallback()
-    val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(applicationContext,  CoroutineScope(
-        SupervisorJob()
-    )
+    val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(applicationContext,
     )}
 
 
@@ -111,6 +112,15 @@ class PlaybackService : MediaLibraryService() {
                 return SessionResult.RESULT_ERROR_NOT_SUPPORTED
             }
         }
+
+        override fun onPlayerCommandRequest(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            playerCommand: Int
+        ): Int {
+            //Log.d("MediaSessionCommand", "Command: $playerCommand")
+            return super.onPlayerCommandRequest(session, controller, playerCommand)
+        }
     }
     private class CustomMediaItemFiller : MediaSession.MediaItemFiller {
         override fun fillInLocalConfiguration(
@@ -170,4 +180,6 @@ class PlaybackService : MediaLibraryService() {
                 .setSessionActivity(pendingIntent)
                 .build()
     }
+
+
 }

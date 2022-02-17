@@ -9,6 +9,7 @@
     <string name="progress_text_view">Progress: %s%%</string>
     <string name="progress_text_view_simple">%s%%</string>
     <string name="search_hint">Search library</string>
+    <string name="duration">%s</string>
     <!-- Input Dialog -->
     <string name="input_title">Search</string>
     <string name="input_message">Search for title, author, genre, ...</string>

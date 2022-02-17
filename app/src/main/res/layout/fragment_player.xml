@@ -58,7 +58,9 @@
         android:layout_marginEnd="34dp"
         android:layout_marginTop="6dp"
         app:trackCornerRadius="8dp"
-        tools:progress="45"/>
+        tools:progress="45"
+        android:max="1000"
+        />
 
 
 
@@ -88,6 +90,9 @@
         app:layout_constraintTop_toBottomOf="@id/total_book_progress"/>
 
     <com.google.android.material.slider.Slider
+        android:valueFrom="0"
+        android:valueTo="1000"
+        
         android:id="@+id/chapter_slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

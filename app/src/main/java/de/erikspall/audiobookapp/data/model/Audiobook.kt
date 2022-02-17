@@ -53,4 +53,8 @@ data class Audiobook(
     override fun hashCode(): Int {
         return Objects.hash(this.audiobookId, this.uri, this.title, this.duration, this.authorId, this.readerId, this.position)
     }*/
+
+    override fun toString(): String {
+        return "{$uri, $coverUri, $title}"
+    }
 }

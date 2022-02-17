@@ -55,6 +55,14 @@ interface AudiobookDao {
     fun getAudiobooksWithInfo(): Flow<List<AudiobookWithInfo>>
 
     @Transaction
+    @Query("SELECT * FROM audiobook WHERE uri = :uri LIMIT 1")
+    fun getAudiobookWithInfo(uri: String): AudiobookWithInfo
+
+    @Transaction
     @Query("SELECT * FROM audiobook")
     fun getAudiobooksWithInfoSync(): List<AudiobookWithInfo>
+
+    @Transaction
+    @Query("SELECT coverUri FROM audiobook WHERE coverUri LIKE '%' || :mediaId LIMIT 1")
+    fun getCoverUriSync(mediaId: Int): String
 }

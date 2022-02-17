@@ -96,6 +96,7 @@
         android:id="@+id/current_book_progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:max="1000"
         app:trackCornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
