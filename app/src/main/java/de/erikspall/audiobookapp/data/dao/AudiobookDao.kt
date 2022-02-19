@@ -65,4 +65,7 @@ interface AudiobookDao {
     @Transaction
     @Query("SELECT coverUri FROM audiobook WHERE coverUri LIKE '%' || :mediaId LIMIT 1")
     fun getCoverUriSync(mediaId: Int): String
+
+    @Query("UPDATE audiobook SET position = :position WHERE uri = :uri")
+    suspend fun setPosition(uri: String, position: Long)
 }

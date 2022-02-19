@@ -2,6 +2,7 @@ package de.erikspall.audiobookapp.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.*
 
 @Entity(tableName = "person")
 data class Person (
@@ -10,11 +11,12 @@ data class Person (
     val lastName: String
 ) {
     override fun toString(): String {
-        return "$firstName $lastName"
+        return "Person: {\n\t $firstName, \n\t $lastName \n}"
     }
 
-   /* override fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         return if (other is Person) {
+            other.personId == this.personId &&
             other.firstName == this.firstName && other.lastName == this.lastName
         } else {
             false
@@ -22,6 +24,7 @@ data class Person (
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(this.firstName, this.lastName)
-    }*/
+        return Objects.hash(this.personId, this.firstName, this.lastName)
+    }
+
 }

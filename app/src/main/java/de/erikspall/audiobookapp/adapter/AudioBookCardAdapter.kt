@@ -16,6 +16,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
+import de.erikspall.audiobookapp.utils.Conversion
 import kotlin.math.roundToInt
 
 /**
@@ -53,10 +54,12 @@ class AudioBookCardAdapter (
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .placeholder(R.drawable.ic_image)
                 .into(book_image)
+            val progressInPercent = ((audiobookWithAuthor.audiobook.position.toDouble() / audiobookWithAuthor.audiobook.duration)*100.0).roundToInt()
+           // Log.d("AudiobookAdapter", "$audiobookWithAuthor")
+           // Log.d("AudiobookAdapter", "Calculated progress: $progressInPercent")
             book_title.text = audiobookWithAuthor.audiobook.title
-            book_progress.text = context?.resources?.getString(R.string.progress_text_view, ((audiobookWithAuthor.audiobook.position / audiobookWithAuthor.audiobook.duration)*100.0).roundToInt().toString())
-            book_progress_indicator.setProgress(((audiobookWithAuthor.audiobook.position / audiobookWithAuthor.audiobook.duration)*100.0).roundToInt(), false)
-
+            book_progress.text = context?.resources?.getString(R.string.progress_text_view, progressInPercent.toString())
+            book_progress_indicator.setProgress(progressInPercent, false)
             playButton.setOnClickListener {
                 onItemClicked(audiobookWithAuthor)
             }
@@ -92,7 +95,7 @@ class AudioBookCardAdapter (
             book_title.text = audiobookWithAuthor.audiobook.title
             book_progress.text = context?.resources?.getString(R.string.progress_text_view, ((audiobookWithAuthor.audiobook.position / audiobookWithAuthor.audiobook.duration)*100.0).roundToInt().toString())
             book_author.text = audiobookWithAuthor.author.toString()
-            book_duration.text = audiobookWithAuthor.audiobook.duration.toString()
+            book_duration.text = Conversion.millisToStr(audiobookWithAuthor.audiobook.duration)
         }
 
         companion object {

@@ -15,6 +15,7 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
+import de.erikspall.audiobookapp.data.model.Audiobook
 import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
 import de.erikspall.audiobookapp.uamp.MediaItemTree
 import de.erikspall.audiobookapp.uamp.PlaybackService
@@ -40,6 +41,8 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
         SessionToken(getContext(), ComponentName(getContext(), PlaybackService::class.java))
     val sessionToken: SessionToken = _sessionToken
 
+
+
     init {
         controllerFuture = MediaController.Builder(
             getContext(),
@@ -57,13 +60,13 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
             MoreExecutors.directExecutor()
         )
 
-        Log.d("FragmentStuff", "PlayerViewModel created!")
+        Log.d("ViewModelLife", "PlayerViewModel created!")
     }
 
     override fun onCleared() {
         super.onCleared()
         releaseBrowserAndController()
-        Log.d("FragmentStuff", "PlayerViewModel destroyed!")
+        Log.d("ViewModelLife", "PlayerViewModel destroyed!")
     }
 
     private fun getContext(): Context {
@@ -75,6 +78,8 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
         MediaController.releaseFuture(controllerFuture)
         controllerCreated.postValue(false)
     }
+
+
 
     /** Useful stuff for playback **/
 
@@ -94,8 +99,26 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
             controller?.setMediaItems(chapters)
             controller?.prepare()
             controller?.play()
+            moveToLastPosition(audiobookWithAuthor.audiobook)
             //controller?.playWhenReady = true
         }
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    private fun moveToLastPosition(audiobook: Audiobook){
+        if (controller == null || controller?.mediaItemCount == 0){
+            throw IllegalStateException()
+        }
+        var chapterIndex = 0
+        while (controller!!.getMediaItemAt(chapterIndex).clippingConfiguration.endPositionMs < audiobook.position) {
+            chapterIndex++
+            if (chapterIndex > controller!!.mediaItemCount-1){
+                chapterIndex--
+                break
+            }
+        }
+
+        controller!!.seekTo(chapterIndex, audiobook.position - controller!!.getMediaItemAt(chapterIndex).clippingConfiguration.startPositionMs)
     }
 
     fun pause() {
@@ -112,7 +135,7 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun seekTo(position: Long) {
-        if (controller!= null) {
+        if (controller != null) {
             controller!!.seekTo(position)
         }
     }
@@ -124,13 +147,13 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun addListener(listener: PlayerListener) {
-        if (controller != null)  {
+        if (controller != null) {
             controller!!.addListener(listener)
         }
     }
 
     fun removeListener(listener: PlayerListener) {
-        if (controller != null)  {
+        if (controller != null) {
             controller!!.removeListener(listener)
         }
     }
@@ -144,8 +167,7 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
 
     @SuppressLint("UnsafeOptInUsageError")
     fun getChapterDuration(): Long {
-        return controller?.duration
-            ?: 1
+        return getCurrentMediaItem().clippingConfiguration.endPositionMs - getCurrentMediaItem().clippingConfiguration.startPositionMs
     }
 
     fun getCurrentPositionInChapter(): Long {
@@ -171,6 +193,10 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
         return ((getCurrentPositionInBook().toDouble() / getBookDuration()) * 1000).toInt()
     }
 
+    fun getTimeLeftInChapter(): Long {
+        return getChapterDuration() - getCurrentPositionInChapter()
+    }
+
     @SuppressLint("UnsafeOptInUsageError")
     private fun getCurrentMediaItem(): MediaItem {
         return controller?.currentMediaItem ?: MediaItem.EMPTY
@@ -179,5 +205,37 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     @SuppressLint("UnsafeOptInUsageError")
     fun getCurrentMediaMetadata(): MediaMetadata {
         return getCurrentMediaItem().mediaMetadata ?: MediaMetadata.EMPTY
+    }
+
+    fun skipChapter() {
+        if (controller?.currentMediaItemIndex ?: 0 < controller?.mediaItemCount ?: 0)
+            controller?.seekToNextMediaItem() ?: Log.d(
+                "PlayerViewModel",
+                "Cannot skip chapter, controller not created!"
+            )
+    }
+
+    fun goBackChapter() {
+        if (getCurrentPositionInChapter() <= 5000) {
+            if (controller?.currentMediaItemIndex ?: 0 > 0) {
+                controller?.seekToPreviousMediaItem() ?: Log.d(
+                    "PlayerViewModel",
+                    "Cannot go back chapter, controller not created!"
+                )
+            } else
+                controller?.seekToDefaultPosition()
+        } else
+            controller?.seekToDefaultPosition()
+    }
+
+    fun forward(ms: Long) {
+        if (getTimeLeftInChapter() - ms > 0) {
+            controller?.seekTo(getCurrentPositionInChapter() + ms) ?: Log.d(
+                "PlayerViewModel",
+                "Controller not created!"
+            )
+        } else {
+            skipChapter()
+        }
     }
 }

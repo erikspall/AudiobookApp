@@ -48,12 +48,9 @@ class NowPlayingFragment: Fragment() {
             activity?.onBackPressed()
         }
 
-        playerViewModel.controllerCreated.observe(viewLifecycleOwner) {
-            if (it) {
-                playerViewModel.addListener(nowPlayingPlayerListener)
 
-            }
-        }
+
+
 
         binding.chapterSlider.setLabelFormatter(TimeFormatter())
         ViewCompat.setOnApplyWindowInsetsListener(binding.nowPlayingLayout){ view, windowInsets ->
@@ -71,10 +68,23 @@ class NowPlayingFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+
         binding.chapterSlider.addOnSliderTouchListener(SliderListener(
             ::onStartSeek,
             ::seek
         ))
+
+        binding.fabGoBack.setOnClickListener {
+            onGoBackChapter()
+        }
+
+        binding.fabSkip.setOnClickListener {
+            onSkipChapter()
+        }
+
+        binding.fabForward.setOnClickListener {
+            onForward(30000)
+        }
 
         binding.fabPlay.setOnClickListener {
             playerViewModel.togglePlayback()
@@ -226,6 +236,12 @@ class NowPlayingFragment: Fragment() {
         super.onResume()
         isInBackground = false
         getBackInSyncWithSession()
+        playerViewModel.controllerCreated.observe(viewLifecycleOwner) {
+            if (it) {
+                playerViewModel.addListener(nowPlayingPlayerListener)
+                Log.d("AppLifecycle", "NowPlaying listener added!")
+            }
+        }
         Log.d("AppLifecycle", "NowPlayingFragment resumed!")
     }
 
@@ -235,6 +251,18 @@ class NowPlayingFragment: Fragment() {
         isInBackground = true
         playerViewModel.removeListener(nowPlayingPlayerListener)
         Log.d("AppLifecycle", "NowPlayingFragment paused!")
+    }
+
+    private fun onSkipChapter(){
+        playerViewModel.skipChapter()
+    }
+
+    private fun onGoBackChapter(){
+        playerViewModel.goBackChapter()
+    }
+
+    private fun onForward(ms: Long){
+        playerViewModel.forward(ms)
     }
    // private fun updatePlaybackProgress(): Boolean = handler.postDelayed({
        /* //Checks if Fragment is visible

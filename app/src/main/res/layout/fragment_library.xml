@@ -65,6 +65,14 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+    <View
+        android:id="@+id/mini_player_background"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/miniplayer_background"/>
+
     <include layout="@layout/mini_player"
         android:id="@+id/mini_player"
         android:visibility="invisible"

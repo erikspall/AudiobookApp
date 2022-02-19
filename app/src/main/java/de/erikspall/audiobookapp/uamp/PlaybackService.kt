@@ -1,5 +1,6 @@
 package de.erikspall.audiobookapp.uamp
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.TaskStackBuilder
@@ -7,8 +8,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
@@ -31,7 +34,6 @@ class PlaybackService : MediaLibraryService() {
     private val librarySessionCallback = CustomMediaLibrarySessionCallback()
     val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(applicationContext,
     )}
-
 
     companion object {//TODO
         private const val SEARCH_QUERY_PREFIX_COMPAT = "androidx://media3-session/playFromSearch"
@@ -78,6 +80,7 @@ class PlaybackService : MediaLibraryService() {
             return Futures.immediateFuture(LibraryResult.ofItemList(children, params))
         }
 
+
         private fun setMediaItemFromSearchQuery(query: String){
             // Only acept query with pattern "play [Title]" or "[Title]"
             // Where [Title]: must be exactly matched
@@ -118,7 +121,15 @@ class PlaybackService : MediaLibraryService() {
             controller: MediaSession.ControllerInfo,
             playerCommand: Int
         ): Int {
-            //Log.d("MediaSessionCommand", "Command: $playerCommand")
+            Log.d("MediaSessionCommand", "Command: $playerCommand")
+            if (playerCommand == Player.COMMAND_PLAY_PAUSE || playerCommand == Player.COMMAND_STOP){
+                savePosition(
+                    !player.isPlaying,
+                    getCurrentMediaItem().mediaMetadata.mediaUri.toString(),
+                    (getCurrentMediaItem().clippingConfiguration.startPositionMs) + player.currentPosition
+                )
+            }
+
             return super.onPlayerCommandRequest(session, controller, playerCommand)
         }
     }
@@ -141,6 +152,22 @@ class PlaybackService : MediaLibraryService() {
         player.release()
         mediaLibrarySession.release()
         super.onDestroy()
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    private fun savePosition(isPlaying:Boolean, uri: String, position: Long) {
+        if (!isPlaying)
+            MainScope().launch {
+                database.audiobookDao().setPosition(
+                    uri,
+                    position
+                )
+                Log.d("PositionSaver", "Saved position")
+            }
+    }
+
+    private fun getCurrentMediaItem(): MediaItem {
+        return player.currentMediaItem ?: MediaItem.EMPTY
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {

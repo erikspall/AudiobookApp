@@ -281,11 +281,13 @@ class LibraryFragment : Fragment() {
 
     private fun hideMiniPlayer() {
         binding.miniPlayer.container.visibility = View.INVISIBLE
+        binding.miniPlayerBackground.visibility = View.INVISIBLE
         //TODO: Abstände resetten sowie evtl Animieren
     }
 
     private fun updateStaticUI(mediaMetadata: MediaMetadata) {
         binding.miniPlayer.container.visibility = View.VISIBLE
+        binding.miniPlayerBackground.visibility = View.VISIBLE
         Glide.with(requireContext())
             .load(mediaMetadata.artworkUri)
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)

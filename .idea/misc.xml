@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.5661458333333333" />
+        <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/gradient.xml" value="0.315" />
+        <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/ic_add.xml" value="0.356" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/ic_author.xml" value="0.34427083333333336" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/ic_cast_disconnected.xml" value="0.40625" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.5661458333333333" />
@@ -12,6 +14,7 @@
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/ic_library.xml" value="0.34427083333333336" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/ic_play.xml" value="0.3925" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/ic_play_checkbox.xml" value="0.4114583333333333" />
+        <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/miniplayer_background.xml" value="0.315" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/layout/activity_main.xml" value="0.490036231884058" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/layout/audiobook_list_item.xml" value="0.46770833333333334" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/layout/dialog_edit_text.xml" value="0.46770833333333334" />

@@ -166,6 +166,7 @@
         app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_go_back"
         style="?attr/floatingActionButtonTertiaryStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -177,6 +178,7 @@
         app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_skip"
         style="?attr/floatingActionButtonTertiaryStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

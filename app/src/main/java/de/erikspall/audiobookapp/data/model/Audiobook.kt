@@ -3,6 +3,7 @@ package de.erikspall.audiobookapp.data.model
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.util.*
 
 /**
  * A data class to represent the audiobook database entity
@@ -35,26 +36,31 @@ data class Audiobook(
     val position: Long
     /* more meta data can go here */
 ) {
-    /*override fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         return if (other is Audiobook) {
             (this.audiobookId == other.audiobookId
                     && this.uri == other.uri
+                    && this.coverUri == other.coverUri
                     && this.title == other.title
                     && this.duration == other.duration
                     && this.authorId == other.authorId
                     && this.readerId == other.readerId
                     && this.position == other.position)
-
         } else {
             false
         }
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(this.audiobookId, this.uri, this.title, this.duration, this.authorId, this.readerId, this.position)
-    }*/
+        return Objects.hash(this.audiobookId, this.uri, this.coverUri, this.title, this.duration, this.authorId, this.readerId, this.position)
+    }
 
     override fun toString(): String {
-        return "{$uri, $coverUri, $title}"
+        return "Audiobook{\n\tUri: $uri,\n" +
+                "\tCover: $coverUri,\n" +
+                "\tTitle: $title,\n" +
+                "\tDuration: $duration,\n" +
+                "\tPosition: $position\n" +
+                "}"
     }
 }
