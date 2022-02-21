@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,6 +21,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentPlayerBinding
 import de.erikspall.audiobookapp.uamp.PlayerListener
+import de.erikspall.audiobookapp.ui.bottom_sheets.SleepTimerSheet
 import de.erikspall.audiobookapp.utils.Conversion
 import de.erikspall.audiobookapp.utils.TimeFormatter
 import de.erikspall.audiobookapp.viewmodels.PlayerViewModel
@@ -88,6 +90,20 @@ class NowPlayingFragment: Fragment() {
 
         binding.fabPlay.setOnClickListener {
             playerViewModel.togglePlayback()
+        }
+
+        binding.bottomAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.sleept_timer_button -> {
+                    val sleepTimerSheet = SleepTimerSheet(::setSleepTimer)
+                    sleepTimerSheet.show(
+                        requireActivity().supportFragmentManager,
+                        SleepTimerSheet.TAG
+                    )
+                    true
+                }
+                else -> false
+            }
         }
     }
 
@@ -264,40 +280,8 @@ class NowPlayingFragment: Fragment() {
     private fun onForward(ms: Long){
         playerViewModel.forward(ms)
     }
-   // private fun updatePlaybackProgress(): Boolean = handler.postDelayed({
-       /* //Checks if Fragment is visible
-        if (_binding != null){
-            val currentPosTotal = sharedViewModel.getCurrentPositionTotal()
-            val progress = ((currentPosTotal / currentBookPlaying!!.audiobook.duration)*1000).toInt()
-            binding.totalCurrentProgressText.text = Conversion.millisToStr(currentPosTotal)
-            binding.totalBookProgress.progress = progress
-            binding.currentChapterProgressText.text = Conversion.millisToStr(sharedViewModel.getCurrentChapterPosition())
-            binding.chapterSlider.value = sharedViewModel.getFinerPosition().toFloat()
-            if (sharedViewModel.controller!!.isPlaying) {
-                updatePlaybackProgress()
-            } else {
-                Log.d("Progress", sharedViewModel.controller!!.playbackState.toString())
-                binding.fabPlay.setImageDrawable(ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_play))
-            }
-        }
-    }, 500)
-*/
-/*  fun updateStaticUI(mediaMetadata: MediaMetadata){
-    /*MainScope().launch {
-          currentBookPlaying = withContext(Dispatchers.IO){
-              databaseViewModel.getAudiobookWithInfo(mediaMetadata.mediaUri.toString())
-          }
-          binding.totalDurationText.text = Conversion.millisToStr(currentBookPlaying!!.audiobook.duration)
-      }
 
-      Glide.with(requireContext())
-          .load(mediaMetadata.artworkUri)
-          .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-          .placeholder(R.drawable.ic_image)
-          .into(binding.bookImage)
-      binding.bookName.text = mediaMetadata.albumTitle
-      binding.chapterName.text = mediaMetadata.title
-      binding.chapterDurationText.text = resources.getString(R.string.duration, Conversion.millisToStr(sharedViewModel.getChapterDuration()))
-      //binding.totalCurrentProgressText.text = Conversion.millisToStr(sharedViewModel.controller!!.currentPosition)*/
- }*/
+    private fun setSleepTimer(time: Long){
+        Toast.makeText(requireContext(), "SleepTimer set for ${Conversion.millisToExtendedStr(time)}", Toast.LENGTH_LONG).show()
+    }
 }

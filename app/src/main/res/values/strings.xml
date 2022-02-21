@@ -6,7 +6,7 @@
     <string name="page_title">Library</string>
     <string name="search">Search</string>
     <string name="content_description_search">Search audiobooks</string>
-    <string name="progress_text_view">Progress: %s%%</string>
+    <string name="progress_text_view">%s%% read</string>
     <string name="progress_text_view_simple">%s%%</string>
     <string name="search_hint">Search library</string>
     <string name="duration">%s</string>
@@ -26,4 +26,14 @@
     <string name="select_chapter">Select chapter</string>
     <string name="set_sleep_timer">Set sleep timer</string>
     <string name="equalizier">Equalizier</string>
+    <string name="sleep_timer">Sleep Timer</string>
+    <string name="ic_moon_descr">Moon</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="set_button">Set</string>
+    <string name="stop_in_button">Stop in</string>
+    <string name="stop_at_button">Stop at</string>
+    <string name="playback_stop_info_at">Playback will stop at %s</string>
+    <string name="playback_stop_info_in">Playback will stop in %d hours and %d minutes</string>
+    <string name="playback_stop_info_in_no_hours">Playback will stop in %d minutes</string>
+    <string name="sleep_timer_error">SleepTimer has to be at least one minute long!</string>
 </resources>

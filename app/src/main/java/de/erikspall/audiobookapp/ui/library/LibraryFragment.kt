@@ -29,6 +29,7 @@ import com.google.android.material.chip.Chip
 import de.erikspall.audiobookapp.AudioBookApp
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
+import de.erikspall.audiobookapp.adapter.AudiobookItemAnimator
 import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.data.handling.import.Importer
 import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
@@ -38,6 +39,7 @@ import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
 import de.erikspall.audiobookapp.uamp.PlayerListener
 import de.erikspall.audiobookapp.ui.bottom_sheets.ModalBottomSheet
 import de.erikspall.audiobookapp.utils.Conversion
+import de.erikspall.audiobookapp.utils.extensions.runWhenReady
 import de.erikspall.audiobookapp.viewmodels.AppViewModel
 import de.erikspall.audiobookapp.viewmodels.PlayerViewModel
 import kotlinx.coroutines.launch
@@ -50,9 +52,10 @@ class LibraryFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
     //private val isVisible = true
     private var isInBackground = false
-
+    private var isUpdatingBookProgress = false
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -103,9 +106,9 @@ class LibraryFragment : Fragment() {
             // if that's more appropriate.
 
             view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                leftMargin = insets.left + 5
+                leftMargin = insets.left + 8
                 bottomMargin = insets.bottom
-                rightMargin = insets.right + 5
+                rightMargin = insets.right + 8
             }
 
             // Return CONSUMED if you don't want want the window insets to keep being
@@ -187,16 +190,6 @@ class LibraryFragment : Fragment() {
             }
         }
 
-        // This is a workaround for a bug. CollapsingToolbar layout is consuming the insets and not
-        // passing them to child. DO NOT REMOVE
-        ViewCompat.setOnApplyWindowInsetsListener(binding.libraryCollapsingtoolbarlayout) { view, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = insets.top
-            }
-            windowInsets
-        }
-
         ViewCompat.setOnApplyWindowInsetsListener(binding.libraryRecyclerView) { view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             // Apply the insets as a margin to the view. Here the system is setting
@@ -207,7 +200,7 @@ class LibraryFragment : Fragment() {
             view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
 
                 bottomMargin =
-                    insets.bottom + Conversion.dpToPx(80) //TODO: Find a way to obtain height of mini player
+                    insets.bottom + Conversion.dpToPx(58) //TODO: Find a way to obtain height of mini player
             }
 
             // Return CONSUMED if you don't want want the window insets to keep being
@@ -232,6 +225,7 @@ class LibraryFragment : Fragment() {
                 getBackInSyncWithSession()
             }
         }
+        binding.libraryRecyclerView.itemAnimator = AudiobookItemAnimator()
         Log.d("AppLifecycle", "LibraryFragment created!")
     }
 
@@ -242,7 +236,11 @@ class LibraryFragment : Fragment() {
             binding.libraryRecyclerView.layoutManager = LinearLayoutManager(this.requireContext())
 
         val adapter =
-            AudioBookCardAdapter(this.requireContext(), ::startPlayback, sharedViewModel.layout)
+            AudioBookCardAdapter(
+                this.requireContext(),
+                ::startPlayback,
+                sharedViewModel.layout
+            )
 
         binding.libraryRecyclerView.adapter = adapter
         databaseViewModel.allAudiobooksWithAuthor.observe(viewLifecycleOwner) { audiobooks ->
@@ -274,10 +272,15 @@ class LibraryFragment : Fragment() {
     }
 
 
-
-    private fun startPlayback(audiobookWithAuthor: AudiobookWithAuthor) {
+    private fun startPlayback(audiobookWithAuthor: AudiobookWithAuthor, position: Int) {
+        //if (sharedViewModel.currentlyPlayingPosition != -1)
+        //    binding.libraryRecyclerView.adapter!!.notifyItemChanged(sharedViewModel.currentlyPlayingPosition)
+        updateViewHolderUI(sharedViewModel.currentlyPlayingPosition, false) // Force old icon to be gone
+        sharedViewModel.currentlyPlayingPosition = position
         playerViewModel.playMedia(audiobookWithAuthor)
+
     }
+
 
     private fun hideMiniPlayer() {
         binding.miniPlayer.container.visibility = View.INVISIBLE
@@ -297,52 +300,95 @@ class LibraryFragment : Fragment() {
         binding.miniPlayer.currentBookChapter.text = mediaMetadata.title
     }
 
+    private fun updateViewHolderUI(position: Int, isPlaying: Boolean) {
+        if (position != -1) {
+            val holder = binding.libraryRecyclerView.findViewHolderForAdapterPosition(
+                position
+            ) as AudioBookCardAdapter.AudiobookViewHolder
+            if (holder is AudioBookCardAdapter.GridCardViewHolder) {
+                holder.playButton.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        if (isPlaying)
+                            R.drawable.ic_pause //TODO: Animate
+                        else
+                            R.drawable.ic_play
+                    )
+                )
+            }
+        }
+    }
+
+    //TODO: This is called twice when returning from Now Playing -> bad
     private fun onPlaybackToggled(isPlaying: Boolean) {
         if (!isPlaying) {
-             binding.miniPlayer.playButton.icon =
+            binding.miniPlayer.playButton.icon =
                 ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_play)
+
+            if (!playerViewModel.isPreparing)
+                cancelUpdates()
 
         } else {
             binding.miniPlayer.playButton.icon =
-               ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_pause)
+                ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_pause)
             startUpdatingDynamicUI()
         }
+        binding.libraryRecyclerView.runWhenReady {
+            updateViewHolderUI(sharedViewModel.currentlyPlayingPosition, isPlaying)
 
+        }
     }
 
-    private fun startUpdatingDynamicUI(){
-        if (!isUpdatingDynamicUI){
+    private fun startUpdatingDynamicUI() {
+        if (!isUpdatingDynamicUI) {
             Log.d("ProgressTracker", "Started updating UI")
             isUpdatingDynamicUI = true
             updateDynamicUI()
+        }
+        if (!isUpdatingBookProgress) {
+            Log.d("ProgressTracker", "Started updating BookProgressCard")
+            isUpdatingBookProgress = true
+            updateBookProgress()
         }
     }
 
     private fun updateDynamicUI(): Boolean = handler.postDelayed({
         //Checks if Fragment is visible
         if (_binding != null) {
-            val progress = playerViewModel.getChapterProgress()
-            //Log.d("Progress", "$progress")
-            //Ensure that progressbar is always visible
-            //if (progress == 0)
-            //    progress = 1
-            //else
-            // binding.miniPlayer.currentBookProgress.progress = progress
-            binding.miniPlayer.currentBookProgress.setProgress(progress, true)
+
+            binding.miniPlayer.currentBookProgress.setProgress(
+                playerViewModel.getChapterProgress(),
+                true
+            )
 
             if (!isInBackground && playerViewModel.isPlaying) {
                 updateDynamicUI()
             } else {
                 isUpdatingDynamicUI = false
-                Log.d("ProgressTracker", "Stopped updating UI")
+                Log.d("ProgressTracker", "Stopped recursion dynamicUI")
             }
         }
     }, 100)
+
+    private fun updateBookProgress(): Boolean = handler.postDelayed({
+        //Checks if Fragment is visible
+        if (_binding != null) {
+            // Simply save progress, live data does the rest
+            playerViewModel.saveProgressToDatabase()
+            if (!isInBackground && playerViewModel.isPlaying) {
+                updateBookProgress()
+            } else {
+                isUpdatingBookProgress = false
+                Log.d("ProgressTracker", "Stopped recursion book Progress")
+            }
+        }
+    }, playerViewModel.milliPerPercentTotal())
 
     private fun getBackInSyncWithSession() {
         if (playerViewModel.isPlaying || playerViewModel.isPaused) {
             updateStaticUI(playerViewModel.getCurrentMediaMetadata())
             // Begin tracking progress
+            startUpdatingDynamicUI()
             onPlaybackToggled(playerViewModel.isPlaying)
         }
     }
@@ -359,6 +405,16 @@ class LibraryFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         isInBackground = true
+        sharedViewModel.previouslyPlayingId = sharedViewModel.currentlyPlayingPosition
+        cancelUpdates()
         Log.d("AppLifecycle", "LibraryFragment paused!")
+    }
+
+
+    fun cancelUpdates() {
+        handler.removeCallbacksAndMessages(null)
+        isUpdatingBookProgress = false
+        isUpdatingDynamicUI = false
+        Log.d("ProgressTracker", "Canceled Updates")
     }
 }

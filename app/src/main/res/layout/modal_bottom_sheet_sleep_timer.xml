@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    android:orientation="vertical">
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_moon"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="@string/ic_moon_descr" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/sleep_timer"
+        style="@style/MaterialAlertDialog.Material3.Title.Text"/>
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:selectionRequired="true"
+        app:checkedButton="@id/stop_in_button"
+        app:singleSelection="true">
+        <Button
+            android:id="@+id/stop_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:text="@string/stop_in_button"
+            />
+    <Button
+        android:id="@+id/stop_at_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stop_at_button"
+        style="?attr/materialButtonOutlinedStyle"
+        />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <TimePicker
+        android:id="@+id/picker"
+        style="@style/Theme.AudiobookApp.TimePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:hapticFeedbackEnabled="true"
+        android:timePickerMode="spinner"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/stop_info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp"
+        tools:text="Playback will stop in 5 hours and 2 minutes"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="right">
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/ThemeOverlay.Material3.Button.TextButton"
+            android:text="@string/cancel_button"/>
+        <Button
+            android:id="@+id/set_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/ThemeOverlay.Material3.Button.TextButton"
+            android:text="@string/set_button"/>
+    </LinearLayout>
+</LinearLayout>

@@ -41,6 +41,10 @@ class DatabaseViewModel(
         return repository.getAudiobookWithInfo(uri)
     }
 
+    suspend fun setPosition(uri: String, progress: Long){
+        repository.setPosition(uri, progress)
+    }
+
 }
 
 class DatabaseViewModelFactory(

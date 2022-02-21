@@ -7,6 +7,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
@@ -15,17 +16,25 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
+import de.erikspall.audiobookapp.data.database.AudiobookRoomDatabase
 import de.erikspall.audiobookapp.data.model.Audiobook
 import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
 import de.erikspall.audiobookapp.uamp.MediaItemTree
 import de.erikspall.audiobookapp.uamp.PlaybackService
 import de.erikspall.audiobookapp.uamp.PlayerListener
+import de.erikspall.audiobookapp.utils.Conversion
+import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     val isPlaying: Boolean
         get() = controller?.isPlaying ?: false
     val isPaused: Boolean
         get() = controller?.playbackState == Player.STATE_READY && !isPlaying
+    val isPreparing: Boolean
+        get() = controller?.playbackState == Player.STATE_BUFFERING
 
     private lateinit var controllerFuture: ListenableFuture<MediaController>
     val controller: MediaController?
@@ -41,7 +50,8 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
         SessionToken(getContext(), ComponentName(getContext(), PlaybackService::class.java))
     val sessionToken: SessionToken = _sessionToken
 
-
+    val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(getContext()
+    )}
 
     init {
         controllerFuture = MediaController.Builder(
@@ -96,7 +106,7 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
             )
         else {
             // TODO: OnMediaData changed is called twice
-            controller?.setMediaItems(chapters)
+            controller?.setMediaItems(chapters, true)
             controller?.prepare()
             controller?.play()
             moveToLastPosition(audiobookWithAuthor.audiobook)
@@ -193,6 +203,10 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
         return ((getCurrentPositionInBook().toDouble() / getBookDuration()) * 1000).toInt()
     }
 
+    fun getBookProgressInPercent(): Double {
+        return getCurrentPositionInBook().toDouble()/getBookDuration()
+    }
+
     fun getTimeLeftInChapter(): Long {
         return getChapterDuration() - getCurrentPositionInChapter()
     }
@@ -236,6 +250,41 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
             )
         } else {
             skipChapter()
+        }
+    }
+
+    /**
+     * Amount of milliseconds to next percent
+     */
+    fun milliPerPercentTotal(): Long {
+        val percent = getBookProgressInPercent()*100.0
+        val offsetToNext = if (percent.roundToInt() > percent) 1 else 0
+        val msPerPercent = getBookDuration()/100
+
+        // Add 1s additional just to be safe
+        Log.d("ProgressTracker", "Percent: $percent, msPerPercent: $msPerPercent + PercentToNext: ${(ceil(percent) - percent) + offsetToNext}")
+        var left = ((ceil(percent) - percent + offsetToNext) * msPerPercent).toLong()
+        if (left < 1000)
+            left = 1000
+
+        val rightNow = Calendar.getInstance()
+        val offset = (rightNow[Calendar.ZONE_OFFSET] +
+                rightNow[Calendar.DST_OFFSET]).toLong()
+
+        val sinceMidnight = (rightNow.timeInMillis + offset) %
+                (24 * 60 * 60 * 1000) + left
+
+        Log.d("ProgressTracker", "Started updating Book Progress with delay: ${Conversion.millisToStr(left)} \n" +
+                "expect update on: ${Conversion.millisToStr(sinceMidnight)}")
+        return left
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    fun saveProgressToDatabase() {
+        viewModelScope.launch {
+            database.audiobookDao().setPosition(
+                getCurrentMediaItem().mediaMetadata.mediaUri.toString(),
+                getCurrentPositionInBook())
         }
     }
 }

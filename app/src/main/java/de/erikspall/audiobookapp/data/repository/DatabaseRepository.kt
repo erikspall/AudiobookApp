@@ -65,4 +65,8 @@ class DatabaseRepository(
         return audiobookDao.getAudiobookWithInfo(uri)
     }
 
+    @WorkerThread
+    suspend fun setPosition(uri: String, progress: Long){
+        audiobookDao.setPosition(uri, progress)
+    }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -23,52 +24,64 @@ import kotlin.math.roundToInt
  * Adapter to inflate the appropriate list item layout and populate the view with information
  * from the appropriate data source
  */
-@androidx.media3.common.util.UnstableApi
-class AudioBookCardAdapter (
+class AudioBookCardAdapter(
     private val context: Context?,
-    private val onItemClicked: (AudiobookWithAuthor) -> Unit,
+    private val onItemClicked: (AudiobookWithAuthor, Int) -> Unit,
     private val layout: Int
-): ListAdapter<AudiobookWithAuthor, AudioBookCardAdapter.AudiobookViewHolder>(AUDIOBOOKS_COMPARATOR){
+) : ListAdapter<AudiobookWithAuthor, AudioBookCardAdapter.AudiobookViewHolder>(AUDIOBOOKS_COMPARATOR) {
     /**
      * Init view elements
      */
-    abstract class AudiobookViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        abstract fun bind(audiobookWithAuthor: AudiobookWithAuthor)
+
+    abstract class AudiobookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        abstract fun bind(audiobookWithAuthor: AudiobookWithAuthor, position: Int)
     }
+
 
     class GridCardViewHolder(
         view: View,
         private val context: Context?,
-        private val onItemClicked: (AudiobookWithAuthor) -> Unit,
-    ): AudiobookViewHolder(view) {
+        private val onItemClicked: (AudiobookWithAuthor, Int) -> Unit
+    ) : AudiobookViewHolder(view) {
         // Declare and init all of the list item UI components
-        val book_image: ImageView = view!!.findViewById(R.id.book_image)
-        val book_title: TextView = view!!.findViewById(R.id.book_title)
-        val book_progress: TextView = view!!.findViewById(R.id.book_progress)
-        val book_progress_indicator: LinearProgressIndicator = view!!.findViewById(R.id.book_progress_indicator)
+        val book_image: ImageView = view.findViewById(R.id.book_image)
+        val book_title: TextView = view.findViewById(R.id.book_title)
+        val book_progress: TextView = view.findViewById(R.id.book_progress)
+        val book_progress_indicator: LinearProgressIndicator =
+            view.findViewById(R.id.book_progress_indicator)
         val playButton: FloatingActionButton = view.findViewById(R.id.play_button)
 
-        override fun bind(audiobookWithAuthor: AudiobookWithAuthor) {
+        override fun bind(audiobookWithAuthor: AudiobookWithAuthor, position: Int) {
             Glide.with(context!!)
                 .load(audiobookWithAuthor.audiobook.coverUri)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .placeholder(R.drawable.ic_image)
                 .into(book_image)
-            val progressInPercent = ((audiobookWithAuthor.audiobook.position.toDouble() / audiobookWithAuthor.audiobook.duration)*100.0).roundToInt()
-           // Log.d("AudiobookAdapter", "$audiobookWithAuthor")
-           // Log.d("AudiobookAdapter", "Calculated progress: $progressInPercent")
+            val progressInPercent =
+                ((audiobookWithAuthor.audiobook.position.toDouble() / audiobookWithAuthor.audiobook.duration) * 100.0).roundToInt()
+            // Log.d("AudiobookAdapter", "$audiobookWithAuthor")
+            // Log.d("AudiobookAdapter", "Calculated progress: $progressInPercent")
             book_title.text = audiobookWithAuthor.audiobook.title
-            book_progress.text = context?.resources?.getString(R.string.progress_text_view, progressInPercent.toString())
+            book_progress.text = context.resources?.getString(
+                R.string.progress_text_view,
+                progressInPercent.toString()
+            )
             book_progress_indicator.setProgress(progressInPercent, false)
             playButton.setOnClickListener {
-                onItemClicked(audiobookWithAuthor)
+                playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause))
+                onItemClicked(audiobookWithAuthor, position)
             }
+
+
         }
 
 
-
         companion object {
-            fun create(parent: ViewGroup, context: Context?, onItemClicked: (AudiobookWithAuthor) -> Unit): GridCardViewHolder {
+            fun create(
+                parent: ViewGroup,
+                context: Context?,
+                onItemClicked: (AudiobookWithAuthor, Int) -> Unit
+            ): GridCardViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
                     .inflate(R.layout.grid_list_item, parent, false)
                 return GridCardViewHolder(view, context, onItemClicked)
@@ -79,21 +92,25 @@ class AudioBookCardAdapter (
     class ListViewHolder(
         view: View,
         private val context: Context?
-    ): AudiobookViewHolder(view) {
-        val book_image: ImageView = view!!.findViewById(R.id.book_image)
-        val book_title: TextView = view!!.findViewById(R.id.book_title)
-        val book_progress: TextView = view!!.findViewById(R.id.book_progress)
-        val book_author: TextView = view!!.findViewById(R.id.book_author)
-        val book_duration: TextView = view!!.findViewById(R.id.book_duration)
+    ) : AudiobookViewHolder(view) {
+        val book_image: ImageView = view.findViewById(R.id.book_image)
+        val book_title: TextView = view.findViewById(R.id.book_title)
+        val book_progress: TextView = view.findViewById(R.id.book_progress)
+        val book_author: TextView = view.findViewById(R.id.book_author)
+        val book_duration: TextView = view.findViewById(R.id.book_duration)
 
-        override fun bind(audiobookWithAuthor: AudiobookWithAuthor) {
+        override fun bind(audiobookWithAuthor: AudiobookWithAuthor, position: Int) {
             Glide.with(context!!)
                 .load(audiobookWithAuthor.audiobook.coverUri)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .placeholder(R.drawable.ic_image)
                 .into(book_image)
             book_title.text = audiobookWithAuthor.audiobook.title
-            book_progress.text = context?.resources?.getString(R.string.progress_text_view, ((audiobookWithAuthor.audiobook.position / audiobookWithAuthor.audiobook.duration)*100.0).roundToInt().toString())
+            book_progress.text = context.resources?.getString(
+                R.string.progress_text_view,
+                ((audiobookWithAuthor.audiobook.position / audiobookWithAuthor.audiobook.duration) * 100.0).roundToInt()
+                    .toString()
+            )
             book_author.text = audiobookWithAuthor.author.toString()
             book_duration.text = Conversion.millisToStr(audiobookWithAuthor.audiobook.duration)
         }
@@ -108,12 +125,10 @@ class AudioBookCardAdapter (
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AudiobookViewHolder {
-
-
         //  Use a conditional to determine the layout type and set it accordingly.
         //  if the layout variable is Layout.GRID the grid list item should be used. Otherwise the
         //  the vertical/horizontal list item should be used.
-        return when(layout){
+        return when (layout) {
             Layout.LIST -> ListViewHolder.create(parent, context)
             else -> GridCardViewHolder.create(parent, context, onItemClicked)
         }
@@ -131,19 +146,53 @@ class AudioBookCardAdapter (
         4. Set author for current book
         5. Set progress for current book
          */
-
         val current = getItem(position)
-        holder.bind(current)
-
+        holder.bind(current, position)
     }
+
     companion object {
+        const val PAYLOAD_COVER = 1
+        const val PAYLOAD_POSITION = 2
+        const val PAYLOAD_TITLE = 3
+        const val PAYLOAD_AUTHOR = 4
+
         private val AUDIOBOOKS_COMPARATOR = object : DiffUtil.ItemCallback<AudiobookWithAuthor>() {
-            override fun areItemsTheSame(oldItem: AudiobookWithAuthor, newItem: AudiobookWithAuthor): Boolean {
-                return oldItem === newItem
+            override fun areItemsTheSame(
+                oldItem: AudiobookWithAuthor,
+                newItem: AudiobookWithAuthor
+            ): Boolean {
+                // Log.d("Diffutil", "areItemsTheSame: ${oldItem === newItem}")
+                return oldItem.audiobook.audiobookId == newItem.audiobook.audiobookId
             }
 
-            override fun areContentsTheSame(oldItem: AudiobookWithAuthor, newItem: AudiobookWithAuthor): Boolean {
-                return oldItem == newItem
+            override fun areContentsTheSame(
+                oldItem: AudiobookWithAuthor,
+                newItem: AudiobookWithAuthor
+            ): Boolean {
+                //Log.d("Diffutil", "areContentsTheSame: ${oldItem == newItem}")
+                // Only check the visible diffrence
+                return oldItem.audiobook.coverUri == newItem.audiobook.coverUri &&
+                        oldItem.audiobook.position == newItem.audiobook.position &&
+                        oldItem.audiobook.title == newItem.audiobook.title &&
+                        oldItem.audiobook.authorId == newItem.audiobook.authorId
+            }
+
+            override fun getChangePayload(
+                oldItem: AudiobookWithAuthor,
+                newItem: AudiobookWithAuthor
+            ): Any? {
+                val changes = HashMap<Int, Any?>()
+                if (oldItem.audiobook.coverUri != newItem.audiobook.coverUri)
+                    changes[PAYLOAD_COVER] = newItem.audiobook.coverUri
+                if (oldItem.audiobook.position != newItem.audiobook.position)
+                    changes[PAYLOAD_POSITION] = newItem.audiobook.position
+                if (oldItem.audiobook.title != newItem.audiobook.title)
+                    changes[PAYLOAD_TITLE] = newItem.audiobook.title
+                if (oldItem.audiobook.authorId != newItem.audiobook.authorId)
+                    changes[PAYLOAD_AUTHOR] = newItem.audiobook.authorId
+
+
+                return if (changes.isEmpty()) changes else null
             }
         }
     }
