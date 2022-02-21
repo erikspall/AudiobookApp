@@ -1,10 +1,16 @@
 package de.erikspall.audiobookapp.ui.now_playing
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,11 +26,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentPlayerBinding
+import de.erikspall.audiobookapp.uamp.PlaybackService
 import de.erikspall.audiobookapp.uamp.PlayerListener
 import de.erikspall.audiobookapp.ui.bottom_sheets.SleepTimerSheet
 import de.erikspall.audiobookapp.utils.Conversion
 import de.erikspall.audiobookapp.utils.TimeFormatter
+import de.erikspall.audiobookapp.utils.extensions.setDrawableColor
 import de.erikspall.audiobookapp.viewmodels.PlayerViewModel
+
 
 class NowPlayingFragment: Fragment() {
     private var _binding: FragmentPlayerBinding? = null
@@ -94,7 +103,7 @@ class NowPlayingFragment: Fragment() {
 
         binding.bottomAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.sleept_timer_button -> {
+                R.id.sleep_timer_button -> {
                     val sleepTimerSheet = SleepTimerSheet(::setSleepTimer)
                     sleepTimerSheet.show(
                         requireActivity().supportFragmentManager,
@@ -281,7 +290,23 @@ class NowPlayingFragment: Fragment() {
         playerViewModel.forward(ms)
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     private fun setSleepTimer(time: Long){
         Toast.makeText(requireContext(), "SleepTimer set for ${Conversion.millisToExtendedStr(time)}", Toast.LENGTH_LONG).show()
+
+        val typedValue = TypedValue()
+        requireContext().theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+
+        binding.bottomAppBar.menu.findItem(R.id.sleep_timer_button).icon =
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_moon).setDrawableColor(
+                ContextCompat.getColor(requireContext(), typedValue.resourceId)
+            )
+
+        val am = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time,
+        PendingIntent.getService(requireActivity(), 0,
+            Intent(requireActivity(), PlaybackService::class.java).setAction(PlaybackService.ACTION_QUIT)
+            , PendingIntent.FLAG_CANCEL_CURRENT + PendingIntent.FLAG_IMMUTABLE, ))
+
     }
 }

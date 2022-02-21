@@ -38,6 +38,7 @@ class PlaybackService : MediaLibraryService() {
     companion object {//TODO
         private const val SEARCH_QUERY_PREFIX_COMPAT = "androidx://media3-session/playFromSearch"
         private const val SEARCH_QUERY_PREFIX = "androidx://media3-session/setMediaUri"
+        public const val ACTION_QUIT = "de.erikspall.audiobookapp.quitservice"
     }
 
     private inner class CustomMediaLibrarySessionCallback :
@@ -172,6 +173,18 @@ class PlaybackService : MediaLibraryService() {
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {
         return mediaLibrarySession
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent != null && intent.action != null) {
+            when (intent.action) {
+                ACTION_QUIT -> {
+                    player.pause()
+                    stopSelf()
+                }
+            }
+        }
+        return super.onStartCommand(intent, flags, startId)
     }
 
     private fun initializeSessionAndPlayer() {

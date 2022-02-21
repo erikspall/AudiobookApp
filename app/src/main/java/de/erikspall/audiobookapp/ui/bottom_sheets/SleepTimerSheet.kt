@@ -11,6 +11,7 @@ import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.ModalBottomSheetSleepTimerBinding
 import de.erikspall.audiobookapp.utils.Conversion
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 class SleepTimerSheet(
@@ -136,8 +137,22 @@ class SleepTimerSheet(
 
     private fun getTimerTimeInMs(): Long {
         if (currentState == STOPPING_AT) {
-            val hour = binding.picker.hour
-            val minute = binding.picker.minute
+            var pickedMs =
+                TimeUnit.HOURS.toMillis(binding.picker.hour.toLong()) + TimeUnit.MINUTES.toMillis(
+                    binding.picker.minute.toLong()
+                )
+            val currentMs = TimeUnit.HOURS.toMillis(
+                Calendar.getInstance().get(Calendar.HOUR_OF_DAY).toLong()
+            ) + TimeUnit.MINUTES.toMillis(
+                Calendar.getInstance().get(Calendar.MINUTE).toLong()
+            )
+            if (pickedMs < currentMs)
+                pickedMs += TimeUnit.HOURS.toMillis(24)
+
+            return abs(pickedMs - currentMs)
+
+
+            /*
             // Calc delta between time in picker and now
             var hourDelta = abs(hour - Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
             // Only get abs value if it is not the same hour
@@ -153,7 +168,7 @@ class SleepTimerSheet(
                     hourDelta = 24
                 }
             }
-            return ((hourDelta * 60L) + minuteDelta) * 60L * 1000L
+            return ((hourDelta * 60L) + minuteDelta) * 60L * 1000L*/
 
         } else {
             // Simple

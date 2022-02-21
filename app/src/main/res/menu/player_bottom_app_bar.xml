@@ -14,7 +14,7 @@
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/sleept_timer_button"
+        android:id="@+id/sleep_timer_button"
         android:title="@string/set_sleep_timer"
         android:icon="@drawable/ic_moon"
         app:showAsAction="always"/>

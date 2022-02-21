@@ -239,7 +239,8 @@ class LibraryFragment : Fragment() {
             AudioBookCardAdapter(
                 this.requireContext(),
                 ::startPlayback,
-                sharedViewModel.layout
+                sharedViewModel.layout,
+                sharedViewModel.currentlyPlayingPosition
             )
 
         binding.libraryRecyclerView.adapter = adapter
@@ -315,6 +316,7 @@ class LibraryFragment : Fragment() {
                             R.drawable.ic_play
                     )
                 )
+                holder.currentlyPlayingPosition = position
             }
         }
     }
