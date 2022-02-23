@@ -36,4 +36,5 @@
     <string name="playback_stop_info_in">Playback will stop in %d hours and %d minutes</string>
     <string name="playback_stop_info_in_no_hours">Playback will stop in %d minutes</string>
     <string name="sleep_timer_error">SleepTimer has to be at least one minute long!</string>
+    <string name="chapters">Chapters</string>
 </resources>

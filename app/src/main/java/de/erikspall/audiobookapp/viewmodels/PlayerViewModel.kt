@@ -45,6 +45,8 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     val browser: MediaBrowser?
         get() = if (browserFuture.isDone) browserFuture.get() else null
 
+
+
     @SuppressLint("UnsafeOptInUsageError")
     private val _sessionToken: SessionToken =
         SessionToken(getContext(), ComponentName(getContext(), PlaybackService::class.java))
@@ -286,5 +288,15 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
                 getCurrentMediaItem().mediaMetadata.mediaUri.toString(),
                 getCurrentPositionInBook())
         }
+    }
+
+    fun getArrayOfCurrentChapters(): Array<MediaItem> {
+        var i = 0
+        val mediaItems: ArrayList<MediaItem> = arrayListOf()
+        while (i < controller!!.mediaItemCount){
+            mediaItems.add(controller!!.getMediaItemAt(i))
+            i++
+        }
+        return mediaItems.toTypedArray()
     }
 }

@@ -5,10 +5,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
+import android.os.*
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -28,6 +25,7 @@ import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentPlayerBinding
 import de.erikspall.audiobookapp.uamp.PlaybackService
 import de.erikspall.audiobookapp.uamp.PlayerListener
+import de.erikspall.audiobookapp.ui.bottom_sheets.ChapterSheet
 import de.erikspall.audiobookapp.ui.bottom_sheets.SleepTimerSheet
 import de.erikspall.audiobookapp.utils.Conversion
 import de.erikspall.audiobookapp.utils.TimeFormatter
@@ -109,6 +107,10 @@ class NowPlayingFragment: Fragment() {
                         requireActivity().supportFragmentManager,
                         SleepTimerSheet.TAG
                     )
+                    true
+                }
+                R.id.chapter_button -> {
+                    showChapterSheet()
                     true
                 }
                 else -> false
@@ -303,10 +305,32 @@ class NowPlayingFragment: Fragment() {
             )
 
         val am = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time,
-        PendingIntent.getService(requireActivity(), 0,
-            Intent(requireActivity(), PlaybackService::class.java).setAction(PlaybackService.ACTION_QUIT)
-            , PendingIntent.FLAG_CANCEL_CURRENT + PendingIntent.FLAG_IMMUTABLE, ))
+        // TODO: make it an option
+        var hasPermission = true
+        if (Build.VERSION.SDK_INT >= 31) {
+            hasPermission = am.canScheduleExactAlarms()
+            Log.d("AlarmManagerAudiobook", "$hasPermission")
+        }
 
+
+        //TODO: Consider exact Timer
+        if (hasPermission)
+            am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time,
+                PendingIntent.getService(requireActivity(), 0,
+                    Intent(requireActivity(), PlaybackService::class.java).setAction(PlaybackService.ACTION_QUIT)
+                    , PendingIntent.FLAG_CANCEL_CURRENT + PendingIntent.FLAG_IMMUTABLE, ))
+        else
+            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time,
+                PendingIntent.getService(requireActivity(), 0,
+                    Intent(requireActivity(), PlaybackService::class.java).setAction(PlaybackService.ACTION_QUIT)
+                    , PendingIntent.FLAG_CANCEL_CURRENT + PendingIntent.FLAG_IMMUTABLE, ))
+    }
+
+    private fun showChapterSheet(){
+        val chapterSheet = ChapterSheet(playerViewModel.getArrayOfCurrentChapters())
+        chapterSheet.show(
+            requireActivity().supportFragmentManager,
+            ChapterSheet.TAG
+        )
     }
 }
