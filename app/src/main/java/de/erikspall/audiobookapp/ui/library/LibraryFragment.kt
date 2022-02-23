@@ -32,7 +32,7 @@ import de.erikspall.audiobookapp.adapter.AudioBookCardAdapter
 import de.erikspall.audiobookapp.adapter.AudiobookItemAnimator
 import de.erikspall.audiobookapp.const.Layout
 import de.erikspall.audiobookapp.data.handling.import.Importer
-import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
+import de.erikspall.audiobookapp.data.source.local.database.model.AudiobookWithAuthor
 import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModel
 import de.erikspall.audiobookapp.data.viewmodels.DatabaseViewModelFactory
 import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding

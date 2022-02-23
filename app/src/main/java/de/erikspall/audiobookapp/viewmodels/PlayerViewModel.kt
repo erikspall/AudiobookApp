@@ -16,9 +16,9 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
-import de.erikspall.audiobookapp.data.database.AudiobookRoomDatabase
-import de.erikspall.audiobookapp.data.model.Audiobook
-import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
+import de.erikspall.audiobookapp.data.source.local.database.AudiobookRoomDatabase
+import de.erikspall.audiobookapp.data.source.local.database.model.Audiobook
+import de.erikspall.audiobookapp.data.source.local.database.model.AudiobookWithAuthor
 import de.erikspall.audiobookapp.uamp.MediaItemTree
 import de.erikspall.audiobookapp.uamp.PlaybackService
 import de.erikspall.audiobookapp.uamp.PlayerListener

@@ -2,9 +2,11 @@ package de.erikspall.audiobookapp
 
 import android.app.Application
 import com.google.android.material.color.DynamicColors
-import de.erikspall.audiobookapp.data.database.AudiobookRoomDatabase
+import dagger.hilt.android.HiltAndroidApp
 import de.erikspall.audiobookapp.data.repository.DatabaseRepository
+import de.erikspall.audiobookapp.data.source.local.database.AudiobookRoomDatabase
 
+@HiltAndroidApp
 class AudioBookApp : Application() {
     val database: AudiobookRoomDatabase by lazy { AudiobookRoomDatabase.getDatabase(this)}
     val repository by lazy {

@@ -36,8 +36,8 @@
         </service>
 
         <provider
-            android:authorities="de.erikspall.audiobookapp.data.provider.CoverProvider"
-            android:name="de.erikspall.audiobookapp.data.provider.CoverProvider"
+            android:authorities="de.erikspall.audiobookapp.provider.CoverProvider"
+            android:name="de.erikspall.audiobookapp.provider.CoverProvider"
             android:grantUriPermissions="true"
             android:exported="true"/>
     </application>

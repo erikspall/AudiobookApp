@@ -9,8 +9,8 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_MIXED
 import androidx.media3.common.MediaMetadata.FOLDER_TYPE_NONE
 import com.google.common.collect.ImmutableList
-import de.erikspall.audiobookapp.data.model.AudiobookWithInfo
-import de.erikspall.audiobookapp.data.model.Chapter
+import de.erikspall.audiobookapp.data.source.local.database.model.AudiobookWithInfo
+import de.erikspall.audiobookapp.data.source.local.database.model.Chapter
 
 /**
  * A sample media catalog that represents media items as a tree.

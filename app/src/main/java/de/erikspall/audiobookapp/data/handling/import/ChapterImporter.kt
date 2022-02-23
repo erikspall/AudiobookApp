@@ -5,8 +5,8 @@ import android.net.Uri
 import android.util.Log
 import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.FFprobeKit
-import de.erikspall.audiobookapp.data.database.AudiobookRoomDatabase
-import de.erikspall.audiobookapp.data.model.Chapter
+import de.erikspall.audiobookapp.data.source.local.database.AudiobookRoomDatabase
+import de.erikspall.audiobookapp.data.source.local.database.model.Chapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray

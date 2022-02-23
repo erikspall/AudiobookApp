@@ -1,8 +1,8 @@
 package de.erikspall.audiobookapp.data.repository
 
 import androidx.annotation.WorkerThread
-import de.erikspall.audiobookapp.data.dao.*
-import de.erikspall.audiobookapp.data.model.*
+import de.erikspall.audiobookapp.data.source.local.database.dao.*
+import de.erikspall.audiobookapp.data.source.local.database.model.*
 import kotlinx.coroutines.flow.Flow
 
 class DatabaseRepository(

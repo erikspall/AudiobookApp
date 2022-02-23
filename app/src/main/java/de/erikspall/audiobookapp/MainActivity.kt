@@ -6,11 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import dagger.hilt.android.AndroidEntryPoint
 import de.erikspall.audiobookapp.databinding.ActivityMainBinding
 
-/**
- * Main Activity and entry point for the app. Displays a RecyclerView of audiobooks.
- */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

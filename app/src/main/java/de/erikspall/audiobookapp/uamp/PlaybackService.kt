@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import de.erikspall.audiobookapp.MainActivity
-import de.erikspall.audiobookapp.data.database.AudiobookRoomDatabase
+import de.erikspall.audiobookapp.data.source.local.database.AudiobookRoomDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch

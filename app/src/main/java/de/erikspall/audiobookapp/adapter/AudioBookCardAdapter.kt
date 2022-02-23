@@ -16,7 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.const.Layout
-import de.erikspall.audiobookapp.data.model.AudiobookWithAuthor
+import de.erikspall.audiobookapp.data.source.local.database.model.AudiobookWithAuthor
 import de.erikspall.audiobookapp.utils.Conversion
 import kotlin.math.roundToInt
 
