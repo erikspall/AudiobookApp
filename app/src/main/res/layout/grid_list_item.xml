@@ -93,16 +93,16 @@
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/book_progress_indicator"
-            app:trackCornerRadius="28dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="16dp"
             android:layout_marginStart="16dp"
-            tools:progress="24"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:trackCornerRadius="28dp"
+            tools:progress="55" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
