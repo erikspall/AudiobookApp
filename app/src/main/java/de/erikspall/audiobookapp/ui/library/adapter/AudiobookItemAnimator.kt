@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.old.adapter
+package de.erikspall.audiobookapp.ui.library.adapter
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter

@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.old.adapter
+package de.erikspall.audiobookapp.ui.library.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.domain.const.Layout
+import de.erikspall.audiobookapp.domain.model.Audiobook
 import de.erikspall.audiobookapp.domain.model.AudiobookWithPersons
 import de.erikspall.audiobookapp.old.utils.Conversion
 import kotlin.math.roundToInt
@@ -26,14 +26,17 @@ import kotlin.math.roundToInt
  */
 class AudioBookCardAdapter(
     private val context: Context?,
-    private val onItemClicked: (AudiobookWithPersons, Int) -> Unit,
+    private val onItemClicked: (Audiobook) -> Unit,
     private val layout: Int,
-    private val currentlyPlayingPosition: Int
-) : ListAdapter<AudiobookWithPersons, AudioBookCardAdapter.AudiobookViewHolder>(AUDIOBOOKS_COMPARATOR) {
+    //private val currentlyPlayingBookId: Long
+) : ListAdapter<AudiobookWithPersons, AudioBookCardAdapter.AudiobookViewHolder>(
+    AUDIOBOOKS_COMPARATOR
+) {
+    //private val idToViewHolder: MutableMap<Long, AudiobookViewHolder> = mutableMapOf()
+
     /**
      * Init view elements
      */
-
     abstract class AudiobookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(audiobookWithPersons: AudiobookWithPersons, position: Int)
     }
@@ -42,8 +45,8 @@ class AudioBookCardAdapter(
     class GridCardViewHolder(
         view: View,
         private val context: Context?,
-        private val onItemClicked: (AudiobookWithPersons, Int) -> Unit,
-        var currentlyPlayingPosition: Int
+        private val onItemClicked: (Audiobook) -> Unit,
+        //var currentlyPlayingBookId: Long
     ) : AudiobookViewHolder(view) {
         // Declare and init all of the list item UI components
         val book_image: ImageView = view.findViewById(R.id.book_image)
@@ -68,27 +71,27 @@ class AudioBookCardAdapter(
                 R.string.progress_text_view,
                 progressInPercent.toString()
             )
-            book_progress_indicator.setProgress(progressInPercent, true)
+            book_progress_indicator.setProgress(progressInPercent, false)
 
-            if (currentlyPlayingPosition == position)
-                playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause))
+            //if (currentlyPlayingBookId == audiobookWithPersons.audiobook.audiobookId)
+            //    playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause))
 
             playButton.setOnClickListener {
-                onItemClicked(audiobookWithPersons, position)
+                onItemClicked(audiobookWithPersons.audiobook)
+                //currentlyPlayingBookId = aud
             }
         }
-
 
         companion object {
             fun create(
                 parent: ViewGroup,
                 context: Context?,
-                onItemClicked: (AudiobookWithPersons, Int) -> Unit,
-                currentlyPlayingPosition: Int
+                onItemClicked: (Audiobook) -> Unit//,
+                //currentlyPlayingBookId: Long
             ): GridCardViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
                     .inflate(R.layout.grid_list_item, parent, false)
-                return GridCardViewHolder(view, context, onItemClicked, currentlyPlayingPosition)
+                return GridCardViewHolder(view, context, onItemClicked)//, currentlyPlayingBookId)
             }
         }
     }
@@ -134,7 +137,12 @@ class AudioBookCardAdapter(
         //  the vertical/horizontal list item should be used.
         return when (layout) {
             Layout.LIST -> ListViewHolder.create(parent, context)
-            else -> GridCardViewHolder.create(parent, context, onItemClicked, currentlyPlayingPosition)
+            else -> GridCardViewHolder.create(
+                parent,
+                context,
+                onItemClicked//,
+                //currentlyPlayingBookId
+            )
         }
     }
 
@@ -152,6 +160,7 @@ class AudioBookCardAdapter(
          */
         val current = getItem(position)
         holder.bind(current, position)
+        //idToViewHolder[current.audiobook.audiobookId] = holder
     }
 
     companion object {

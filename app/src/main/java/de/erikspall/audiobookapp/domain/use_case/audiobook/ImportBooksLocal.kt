@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.domain.use_case
+package de.erikspall.audiobookapp.domain.use_case.audiobook
 
 import de.erikspall.audiobookapp.domain.repository.AppRepository
 

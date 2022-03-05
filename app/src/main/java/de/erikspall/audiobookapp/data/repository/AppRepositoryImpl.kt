@@ -52,6 +52,14 @@ class AppRepositoryImpl(
         return allAudiobooksWithPersons
     }
 
+    override fun getAudiobooksWithInfo(): Flow<List<AudiobookWithInfo>> {
+        return allAudiobooksWithInfo
+    }
+
+    override suspend fun setPosition(bookUri: String, position: Long) {
+        audiobookRepo.setPosition(bookUri, position)
+    }
+
     private suspend fun getOrInsertPerson(person: String): Long {
         val firstName = person.substringBeforeLast(" ")
         val lastName = person.substringAfterLast(" ")

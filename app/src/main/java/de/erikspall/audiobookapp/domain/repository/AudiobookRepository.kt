@@ -29,5 +29,5 @@ interface AudiobookRepository {
 
     suspend fun deleteAll()
 
-    suspend fun setPosition(uri: String, position: Long)
+    suspend fun setPosition(bookUri: String, position: Long)
 }

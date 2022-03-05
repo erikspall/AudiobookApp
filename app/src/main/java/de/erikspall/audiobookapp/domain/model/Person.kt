@@ -11,7 +11,7 @@ data class Person (
     val lastName: String
 ) {
     override fun toString(): String {
-        return "Person: {\n\t $firstName, \n\t $lastName \n}"
+        return "$firstName $lastName"
     }
 
     override fun equals(other: Any?): Boolean {

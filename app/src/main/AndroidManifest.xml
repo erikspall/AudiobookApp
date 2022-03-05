@@ -18,16 +18,16 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
         </activity>
         <service
-            android:name="de.erikspall.audiobookapp.old.uamp.PlaybackService"
+            android:name="de.erikspall.audiobookapp.domain.services.playback.background.PlayerService"
             android:exported="true">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService"/>

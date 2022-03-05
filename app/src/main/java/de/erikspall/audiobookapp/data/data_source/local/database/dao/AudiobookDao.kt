@@ -47,6 +47,6 @@ interface AudiobookDao {
     @Query("DELETE FROM audiobook")
     suspend fun deleteAll()
 
-    @Query("UPDATE audiobook SET position = :position WHERE uri = :uri")
-    suspend fun setPosition(uri: String, position: Long)
+    @Query("UPDATE audiobook SET position = :position WHERE uri = :bookUri")
+    suspend fun setPosition(bookUri: String, position: Long)
 }

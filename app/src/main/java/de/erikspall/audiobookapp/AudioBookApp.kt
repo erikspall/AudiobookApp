@@ -8,9 +8,9 @@ import dagger.hilt.android.HiltAndroidApp
 class AudioBookApp : Application() {
     //val database: AudiobookDatabase by lazy { AudiobookDatabase.getDatabase(this)}
 
-
     override fun onCreate() {
         super.onCreate()
         DynamicColors.applyToActivitiesIfAvailable(this)
     }
+
 }

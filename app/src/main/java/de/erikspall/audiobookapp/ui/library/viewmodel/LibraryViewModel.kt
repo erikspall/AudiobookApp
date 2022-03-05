@@ -6,15 +6,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.erikspall.audiobookapp.domain.const.Layout
 import de.erikspall.audiobookapp.domain.model.AudiobookWithPersons
-import de.erikspall.audiobookapp.domain.use_case.AudiobookUseCases
+import de.erikspall.audiobookapp.domain.use_case.audiobook.AudiobookUseCases
 import de.erikspall.audiobookapp.domain.util.audiobook.order.AudiobookOrder
 import de.erikspall.audiobookapp.domain.util.audiobook.order.OrderType
 import de.erikspall.audiobookapp.ui.library.event.LibraryEvent
 import de.erikspall.audiobookapp.ui.library.viewmodel.state.LibraryState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,8 +20,7 @@ class LibraryViewModel @Inject constructor(
     private val audiobookUseCases: AudiobookUseCases
 ) : ViewModel(){
 
-    private val _state = MutableStateFlow(LibraryState())
-    val state: StateFlow<LibraryState> = _state.asStateFlow()
+    val state = LibraryState()
     val books = getBooks(AudiobookOrder.Title(OrderType.Ascending)).asLiveData()
 
     /* fired by ui */
@@ -34,13 +30,11 @@ class LibraryViewModel @Inject constructor(
 
             }
              is LibraryEvent.SwitchLayout ->  {
-                 _state.value = state.value.copy(
-                     layout = when(state.value.layout){
-                         Layout.GRID -> Layout.LIST
-                         Layout.LIST -> Layout.GRID
-                         else -> Layout.GRID
-                     }
-                 )
+                 state.layout.postValue(when(state.layout.value){
+                     Layout.GRID -> Layout.LIST
+                     Layout.LIST -> Layout.GRID
+                     else -> Layout.GRID
+                 })
              }
             is LibraryEvent.Import -> {
                 viewModelScope.launch {

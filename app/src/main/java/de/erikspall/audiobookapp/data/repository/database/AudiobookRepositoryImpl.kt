@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.data.repository
+package de.erikspall.audiobookapp.data.repository.database
 
 import de.erikspall.audiobookapp.data.data_source.local.database.dao.AudiobookDao
 import de.erikspall.audiobookapp.domain.model.Audiobook
@@ -54,7 +54,7 @@ class AudiobookRepositoryImpl(
         audiobookDao.deleteAll()
     }
 
-    override suspend fun setPosition(uri: String, position: Long) {
-        audiobookDao.setPosition(uri, position)
+    override suspend fun setPosition(bookUri: String, position: Long) {
+        audiobookDao.setPosition(bookUri, position)
     }
 }

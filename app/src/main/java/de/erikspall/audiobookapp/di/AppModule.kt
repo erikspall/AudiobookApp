@@ -9,7 +9,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import de.erikspall.audiobookapp.data.data_source.local.database.AudiobookDatabase
 import de.erikspall.audiobookapp.data.data_source.local.disk.AudiobookFileDataSource
-import de.erikspall.audiobookapp.data.repository.*
+import de.erikspall.audiobookapp.data.data_source.local.player_controller.ControllerDataSource
+import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTreeDataSource
+import de.erikspall.audiobookapp.data.repository.AppRepositoryImpl
+import de.erikspall.audiobookapp.data.repository.database.*
+import de.erikspall.audiobookapp.data.repository.player_controller.PlayerControllerRepositoryImpl
 import de.erikspall.audiobookapp.domain.repository.*
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
@@ -17,10 +21,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-
-
-
     @Provides
     @Singleton
     fun provideBookDatabase(app: Application): AudiobookDatabase {
@@ -64,6 +64,33 @@ object AppModule {
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): AudiobookFileDataSource {
         return AudiobookFileDataSource(appContext, ioDispatcher)
+    }
+
+    @Provides
+    @Singleton
+    fun provideControllerDataSource(
+        @ApplicationContext appContext: Context
+    ): ControllerDataSource {
+        return ControllerDataSource(appContext) { /* Don't do anything */ }
+    }
+
+    @Provides
+    @Singleton
+    fun provideMediaItemTreeDataSource(
+    ): MediaItemTreeDataSource {
+        return MediaItemTreeDataSource()
+    }
+
+    @Provides
+    @Singleton
+    fun providePlayerControllerRepository(
+        mediaItemTreeDataSource: MediaItemTreeDataSource,
+        controllerDataSource: ControllerDataSource
+    ) : PlayerControllerRepository {
+        return PlayerControllerRepositoryImpl(
+            mediaItemTreeDataSource,
+            controllerDataSource
+        )
     }
 
     @Provides
