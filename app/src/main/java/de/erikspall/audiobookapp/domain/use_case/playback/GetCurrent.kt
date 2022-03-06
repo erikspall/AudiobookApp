@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import de.erikspall.audiobookapp.domain.repository.PlayerControllerRepository
 
 class GetCurrent(
@@ -13,12 +14,27 @@ class GetCurrent(
         return repository.getCurrentMediaItem()
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
+    fun mediaItem(player: Player): MediaItem {
+        return player.currentMediaItem ?: MediaItem.EMPTY
+    }
+
     fun mediaMetaData(): MediaMetadata {
         return repository.getCurrentMediaMetadata()
     }
 
-    fun clippingConfiguration(): MediaItem.ClippingConfiguration{
+    @SuppressLint("UnsafeOptInUsageError")
+    fun mediaMetaData(player: Player): MediaMetadata {
+        return mediaItem(player).mediaMetadata
+    }
+
+    fun clippingConfiguration(): MediaItem.ClippingConfiguration {
         return repository.getCurrentClippingConfig()
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    fun clippingConfiguration(player: Player): MediaItem.ClippingConfiguration {
+        return mediaItem(player).clippingConfiguration
     }
 
     fun chapterDuration(): Long {
@@ -28,6 +44,12 @@ class GetCurrent(
     fun positionInBook(): Long {
         return repository.getCurrentPositionInBook()
     }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    fun positionInBook(player: Player): Long {
+        return clippingConfiguration(player).startPositionMs + player.contentPosition
+    }
+
     fun positionInChapter(): Long {
         return repository.getCurrentPositionInChapter()
     }
@@ -41,7 +63,7 @@ class GetCurrent(
 
         val firstIndex = raw.indexOf("]") + 1
         Log.d("PlaybackUseCases", "bookId() firstIndex: $firstIndex")
-        val lastIndex = raw.indexOf("[", startIndex = firstIndex+1)
+        val lastIndex = raw.indexOf("[", startIndex = firstIndex + 1)
         Log.d("PlaybackUseCases", "bookId() lastIndex: $lastIndex")
         val idString = when (lastIndex) {
             -1 -> raw.substring(firstIndex)

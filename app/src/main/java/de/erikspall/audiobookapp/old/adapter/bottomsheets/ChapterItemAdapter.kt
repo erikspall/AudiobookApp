@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.media3.common.MediaItem
 import androidx.recyclerview.widget.RecyclerView
 import de.erikspall.audiobookapp.R
-import de.erikspall.audiobookapp.old.utils.Conversion
+import de.erikspall.audiobookapp.domain.util.Conversion
 
 class ChapterItemAdapter(
     private val dataSet: Array<MediaItem>

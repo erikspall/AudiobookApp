@@ -17,7 +17,7 @@ import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.domain.const.Layout
 import de.erikspall.audiobookapp.domain.model.Audiobook
 import de.erikspall.audiobookapp.domain.model.AudiobookWithPersons
-import de.erikspall.audiobookapp.old.utils.Conversion
+import de.erikspall.audiobookapp.domain.util.Conversion
 import kotlin.math.roundToInt
 
 /**

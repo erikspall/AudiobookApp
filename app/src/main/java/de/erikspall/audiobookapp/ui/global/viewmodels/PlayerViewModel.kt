@@ -32,7 +32,7 @@ class PlayerViewModel @Inject constructor(
     private val handler = Handler(Looper.getMainLooper())
 
     init {
-       initializeController()
+        initializeController()
     }
 
     override fun onCleared() {
@@ -45,7 +45,7 @@ class PlayerViewModel @Inject constructor(
     fun initializeController() {
         playbackUseCases.initizialize.controller {
 
-           // state.controllerCreated.postValue(true)
+            // state.controllerCreated.postValue(true)
             state.isPlaying = playbackUseCases.state.isPlaying()
             state.mediaMetadata.value = (playbackUseCases.getCurrent.mediaMetaData())
             //state.isPrepared.postValue(playbackUseCases.state.isPrepared())
@@ -53,7 +53,7 @@ class PlayerViewModel @Inject constructor(
 
             if (playbackUseCases.state.isPlaying()) {
                 state.currentlyPlayingBookId = (playbackUseCases.getCurrent.bookId())
-               recoverState(Player.STATE_PLAYING)
+                recoverState(Player.STATE_PLAYING)
             } else if (playbackUseCases.state.isPrepared()) {
                 recoverState(Player.STATE_PAUSED)
             }
@@ -68,18 +68,13 @@ class PlayerViewModel @Inject constructor(
                     if (!playing) {
                         state.currentlyPlayingBookId = (-1)
                         stopAllUpdates()
-                        if (isInBackground) {
-                            Log.d("LiveData", "Saving Position in Background...")
-                            val uri = state.mediaMetadata.value!!.mediaUri.toString()
-                            val pos = playbackUseCases.getCurrent.positionInBook()
-                            savePosition(uri, pos)
-                        }
                         state.playbackState.value = (Player.STATE_PAUSED)
                     } else {
                         state.currentlyPlayingBookId = (playbackUseCases.getCurrent.bookId())
                         if (!isInBackground) {
                             Log.d("LiveData", "Started updating progress")
-                            keepProgressUpdated()
+                            keepBookProgressUpdated()
+                            keepChapterProgressUpdated()
                         }
                         state.playbackState.postValue(Player.STATE_PLAYING)
                     }
@@ -87,7 +82,9 @@ class PlayerViewModel @Inject constructor(
                 { mediaMetadata ->
                     Log.d("LiveData", "Metadata changed! Posting ...")
                     state.mediaMetadata.value = (mediaMetadata)
-                    //triggerUpdate()
+                    // Only triggerUpdate if
+                    if (state.playbackState.value == Player.STATE_PLAYING)
+                        triggerUpdate()
                     //triggerMetaUpate(state.playbackState.value!!)
                     //state.currentlyPlayingBookId.postValue(-1)
                 },
@@ -105,10 +102,10 @@ class PlayerViewModel @Inject constructor(
     fun onEvent(event: PlayerEvent) {
         when (event) {
             is PlayerEvent.TogglePlayPause -> {
-                if (playbackUseCases.state.isPlaying()){
+                if (playbackUseCases.state.isPlaying()) {
                     val currentMediaMetadata = playbackUseCases.getCurrent.mediaMetaData()
-                    if (currentMediaMetadata != MediaMetadata.EMPTY)
-                        savePosition(currentMediaMetadata.mediaUri.toString(), playbackUseCases.getCurrent.positionInBook())
+                    //if (currentMediaMetadata != MediaMetadata.EMPTY)
+                    //savePosition(currentMediaMetadata.mediaUri.toString(), playbackUseCases.getCurrent.positionInBook())
                 }
                 playbackUseCases.togglePlayback()
             }
@@ -116,29 +113,35 @@ class PlayerViewModel @Inject constructor(
                 // Save position of current Book before switching to new book
                 val currentMediaMetadata = playbackUseCases.getCurrent.mediaMetaData()
                 if (currentMediaMetadata != MediaMetadata.EMPTY)
-                    savePosition(currentMediaMetadata.mediaUri.toString(), playbackUseCases.getCurrent.positionInBook())
+                    savePosition(
+                        currentMediaMetadata.mediaUri.toString(),
+                        playbackUseCases.getCurrent.positionInBook()
+                    )
 
                 playbackUseCases.playBook(event.audiobook)
             }
-            is PlayerEvent.AppWentToForeground -> {
+            is PlayerEvent.LibraryWentToForeground -> {
                 isInBackground = false
+                Log.d("LiveData", "Library in Foreground")
                 // Resume updating progress if needed
                 if (state.isPlaying) {
                     recoverState(Player.STATE_PLAYING)
                     Log.d("LiveData", "Resumed updating progress")
-                    keepProgressUpdated()
-                } else if (playbackUseCases.state.isPrepared()){
+                    keepBookProgressUpdated()
+                    keepChapterProgressUpdated()
+                } else if (playbackUseCases.state.isPrepared()) {
                     recoverState(Player.STATE_PAUSED)
                 }
             }
-            is PlayerEvent.AppWentToBackground -> {
+            is PlayerEvent.LibraryWentToBackground -> {
                 isInBackground = true
+                Log.d("LiveData", "Library in Background")
                 stopAllUpdates()
             }
         }
     }
 
-    private fun savePosition(uri: String, position: Long){
+    private fun savePosition(uri: String, position: Long) {
         if (uri.isNotEmpty())
             viewModelScope.launch { // TODO: Should probably save in service
                 bookUseCases.savePosition(
@@ -153,11 +156,23 @@ class PlayerViewModel @Inject constructor(
             .toDouble() / playbackUseCases.getCurrent.chapterDuration()) * 1000).toInt()
     }
 
-    private fun keepProgressUpdated() {
+    // Progress of mini-player
+    private fun keepChapterProgressUpdated() {
         handler.postDelayed({
             state.sliderProgress.postValue(progressBig())
-            keepProgressUpdated()
+            keepChapterProgressUpdated()
         }, 300)
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    private fun keepBookProgressUpdated() {
+        handler.postDelayed({
+            savePosition(
+                playbackUseCases.getCurrent.mediaMetaData().mediaUri.toString(),
+                playbackUseCases.getCurrent.positionInBook()
+            )
+            keepBookProgressUpdated()
+        }, 60000) //Every minute
     }
 
     private fun stopAllUpdates() {
@@ -167,18 +182,20 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun recoverState(playerState: Int) {
-        state.playbackState.value = Player.STATE_BUFFERING
+        Log.d("PlaybackStateLib", "Recovering state: $playerState")
+        //state.playbackState.value = Player.STATE_BUFFERING
         state.playbackState.value = Player.STATE_READY
         state.playbackState.value = playerState
     }
 
     private fun triggerUpdate() {
+        Log.d("PlaybackStateLib", "Trigger UI Update")
         state.playbackState.value = Player.STATE_READY //Triggers UI updates
 
         if (playbackUseCases.state.isPlaying()) {
-            recoverState(Player.STATE_PLAYING)
+            state.playbackState.value = (Player.STATE_PLAYING)
         } else if (playbackUseCases.state.isPrepared()) {
-            recoverState(Player.STATE_PAUSED)
+            state.playbackState.value = (Player.STATE_PAUSED)
         }
     }
 }

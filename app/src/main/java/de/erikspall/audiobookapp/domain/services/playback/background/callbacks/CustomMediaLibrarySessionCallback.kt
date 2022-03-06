@@ -3,7 +3,9 @@ package de.erikspall.audiobookapp.domain.services.playback.background.callbacks
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaLibraryService.MediaLibrarySession
@@ -15,10 +17,18 @@ import com.google.common.util.concurrent.ListenableFuture
 import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTree
 import de.erikspall.audiobookapp.domain.services.playback.background.PlayerService.Companion.SEARCH_QUERY_PREFIX
 import de.erikspall.audiobookapp.domain.services.playback.background.PlayerService.Companion.SEARCH_QUERY_PREFIX_COMPAT
+import de.erikspall.audiobookapp.domain.use_case.audiobook.AudiobookUseCases
+import de.erikspall.audiobookapp.domain.use_case.playback.PlaybackUseCases
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class CustomMediaLibrarySessionCallback(
-    private val setMediaItemFromSearchQuery: (String) -> Unit
+    private val setMediaItemFromSearchQuery: (String) -> Unit,
+    private val audiobookUseCases: AudiobookUseCases,
+    private val playbackUseCases: PlaybackUseCases
 ) : MediaLibrarySession.MediaLibrarySessionCallback {
+
+
     @SuppressLint("UnsafeOptInUsageError")
     override fun onSetMediaUri(
         session: MediaSession,
@@ -81,5 +91,42 @@ class CustomMediaLibrarySessionCallback(
         return Futures.immediateFuture(LibraryResult.ofItemList(children, params))
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
+    override fun onPlayerCommandRequest(
+        session: MediaSession,
+        controller: MediaSession.ControllerInfo,
+        playerCommand: Int
+    ): Int {
 
+        when (playerCommand) {
+            Player.COMMAND_PLAY_PAUSE -> {
+                if (session.player.isPlaying) {
+                    Log.d("PlayerCommand", "Pause requested")
+                    // Pause is requested -> Save progress
+                    val book = (session.player.currentMediaItem?.mediaMetadata?.mediaUri ?: Uri.EMPTY).toString()
+                    MainScope().launch {
+                        audiobookUseCases.savePosition(
+                            book,
+                            playbackUseCases.getCurrent.positionInBook(session.player)
+                        )
+                    }
+                } else {
+                    Log.d("PlayerCommand", "Play requested")
+                }
+            }
+            Player.COMMAND_STOP -> {
+                val book = (session.player.currentMediaItem?.mediaMetadata?.mediaUri ?: Uri.EMPTY).toString()
+                MainScope().launch {
+                    audiobookUseCases.savePosition(
+                        book,
+                        playbackUseCases.getCurrent.positionInBook(session.player)
+                    )
+                }
+            }
+            else -> {
+                Log.d("PlayerCommand", "Unknown: $playerCommand")
+            }
+        }
+        return super.onPlayerCommandRequest(session, controller, playerCommand)
+    }
 }

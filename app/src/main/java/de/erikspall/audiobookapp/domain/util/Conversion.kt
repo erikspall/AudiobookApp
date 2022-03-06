@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.old.utils
+package de.erikspall.audiobookapp.domain.util
 
 import android.content.res.Resources
 import java.util.concurrent.TimeUnit

@@ -7,10 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getDrawable
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.media3.common.MediaMetadata
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -20,6 +24,7 @@ import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
 import de.erikspall.audiobookapp.domain.const.Layout
 import de.erikspall.audiobookapp.domain.const.Player
+import de.erikspall.audiobookapp.domain.util.Conversion
 import de.erikspall.audiobookapp.ui.global.events.PlayerEvent
 import de.erikspall.audiobookapp.ui.global.viewmodels.PlayerViewModel
 import de.erikspall.audiobookapp.ui.library.adapter.AudioBookCardAdapter
@@ -42,15 +47,9 @@ class LibraryFragment : Fragment() {
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        //lifecycleScope.launch {
-         //   // Listens for changes in the layout variable
-         //   viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-         //       viewModel.state
-         //           .map { it.layout }
-         //           .distinctUntilChanged()
-          //          .collect { newLayout -> setAppropriateManagerAndAdapter(newLayout) }
-          //  }
-        //}
+        pushMiniPlayerAboveNavBar()
+        pushRecyclerViewItemsAboveNavBar()
+
         viewModel.state.layout.observe(viewLifecycleOwner) { layout ->
             setAppropriateManagerAndAdapter(layout)
         }
@@ -85,12 +84,19 @@ class LibraryFragment : Fragment() {
             playerViewModel.onEvent(PlayerEvent.TogglePlayPause)
         }
 
+        binding.miniPlayer.container.setOnClickListener {
+            val action = LibraryFragmentDirections.actionLibraryFragmentToNowPlayingFragment()
+            binding.miniPlayer.container.findNavController().navigate(action)
+            //binding.miniPlayer.container.isVisible = false
+        }
+
         // Start observing player
         playerViewModel.state.playbackState.observe(viewLifecycleOwner) { playbackState ->
             when (playbackState) {
                 Player.STATE_NONE -> {
                     Log.d("PlaybackStateLib", "None -> Hiding mini-player")
-                    // No media item set -> dont show anything
+                    // No media item set -> dont show anything and reset recyclerview
+                    pushRecyclerContentAboveMiniPlayer(0)
                     binding.miniPlayer.container.visibility = View.INVISIBLE
                     binding.miniPlayerBackground.visibility = View.INVISIBLE
                 }
@@ -98,14 +104,18 @@ class LibraryFragment : Fragment() {
                     Log.d("PlaybackStateLib", "Idle -> Do nothing")
                 }
                 Player.STATE_BUFFERING -> {
-                    Log.d("PlaybackStateLib", "Buffering -> Show miniPlayer with progress indicator")
-                    showBufferingInMiniPlayer()
+                    Log.d(
+                        "PlaybackStateLib",
+                        "Buffering -> do nothing"
+                    )
+
+                    //showBufferingInMiniPlayer()
                 }
                 Player.STATE_READY -> {
                     Log.d("PlaybackStateLib", "Ready -> Begin observing metadata")
                     // Showing current info is handled by observing mediaMetadata
+                    pushRecyclerContentAboveMiniPlayer()
                     loadIntoMiniPlayer(playerViewModel.state.mediaMetadata.value!!)
-
                 }
                 Player.STATE_ENDED -> {
                     Log.d("PlaybackStateLib", "Ended -> Do nothing")
@@ -113,7 +123,8 @@ class LibraryFragment : Fragment() {
                 Player.STATE_PAUSED -> {
                     Log.d("PlaybackStateLib", "Paused -> update icon")
 
-                    binding.miniPlayer.playButton.icon = getDrawable(requireContext(), R.drawable.ic_play)
+                    binding.miniPlayer.playButton.icon =
+                        getDrawable(requireContext(), R.drawable.ic_play)
                 }
                 Player.STATE_PLAYING -> {
                     Log.d("PlaybackStateLib", "Playing -> update icon")
@@ -135,8 +146,6 @@ class LibraryFragment : Fragment() {
     }
 
     private fun showBufferingInMiniPlayer() {
-        binding.miniPlayer.container.visibility = View.VISIBLE
-        binding.miniPlayerBackground.visibility = View.VISIBLE
         binding.miniPlayer.currentBookProgress.isIndeterminate = true
         Glide.with(requireContext())
             .load(R.drawable.ic_image)
@@ -148,7 +157,9 @@ class LibraryFragment : Fragment() {
     }
 
     @SuppressLint("UnsafeOptInUsageError")
-    private fun loadIntoMiniPlayer(metaData: MediaMetadata){
+    private fun loadIntoMiniPlayer(metaData: MediaMetadata) {
+        binding.miniPlayer.container.visibility = View.VISIBLE
+        binding.miniPlayerBackground.visibility = View.VISIBLE
         binding.miniPlayer.currentBookProgress.isIndeterminate = false
         binding.miniPlayer.currentBookProgress.setProgress(playerViewModel.progressBig(), false)
         Log.d("Library", "Loading metadata: ${metaData.title}")
@@ -186,43 +197,59 @@ class LibraryFragment : Fragment() {
                 Log.d("LiveData", "NewBooks/Information received!")
             }
     }
-/*
-    private fun updateViewHolderUI(playingBookId: Long) {
-        val adapter = binding.libraryRecyclerView.adapter
-        if (adapter is AudioBookCardAdapter) {
-            val holder = adapter.getViewHolderOf(playingBookId)
-            if (holder is AudioBookCardAdapter.GridCardViewHolder) {
-                val previousBookId = holder.currentlyPlayingBookId //TODO: make that more global or something
-                if (previousBookId != playingBookId) {
-                    val previousHolder = adapter.getViewHolderOf(previousBookId)
-                    if (previousHolder is AudioBookCardAdapter.GridCardViewHolder) {
-                        previousHolder.playButton.setImageDrawable(
-                            getDrawable(
-                                requireContext(),
-                                R.drawable.ic_play
-                            )
-                        )
-                    }
-                    holder.playButton.setImageDrawable(
-                        getDrawable(
-                            requireContext(),
-                                R.drawable.ic_pause //TODO: Animate
-
-                        )
-                    )
-                    holder.currentlyPlayingBookId = playingBookId
-                }
-            }
-        }
-    }*/
 
     override fun onResume() {
         super.onResume()
-        playerViewModel.onEvent(PlayerEvent.AppWentToForeground)
+        playerViewModel.onEvent(PlayerEvent.LibraryWentToForeground)
     }
 
     override fun onPause() {
+        playerViewModel.onEvent(PlayerEvent.LibraryWentToBackground)
         super.onPause()
-        playerViewModel.onEvent(PlayerEvent.AppWentToBackground)
+    }
+
+    private fun pushMiniPlayerAboveNavBar() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.miniPlayer.container) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply the insets as a margin to the view. Here the system is setting
+            // only the bottom, left, and right dimensions, but apply whichever insets are
+            // appropriate to your layout. You can also update the view padding
+            // if that's more appropriate.
+
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = insets.left + 16
+                bottomMargin = insets.bottom
+                rightMargin = insets.right + 16
+            }
+
+            // Return CONSUMED if you don't want want the window insets to keep being
+            // passed down to descendant views.
+            //WindowInsetsCompat.CONSUMED
+            windowInsets
+        }
+    }
+
+    private fun pushRecyclerViewItemsAboveNavBar() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.libraryRecyclerView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply the insets as a margin to the view. Here the system is setting
+            // only the bottom, left, and right dimensions, but apply whichever insets are
+            // appropriate to your layout. You can also update the view padding
+            // if that's more appropriate.
+
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+
+                bottomMargin =
+                    insets.bottom //TODO: Find a way to obtain height of mini player
+            }
+
+            // Return CONSUMED if you don't want want the window insets to keep being
+            // passed down to descendant views.
+            WindowInsetsCompat.CONSUMED
+        }
+    }
+
+    private fun pushRecyclerContentAboveMiniPlayer(miniPlayerHeight: Int = 50) {
+        binding.libraryRecyclerView.setPadding(8, 0, 8, Conversion.dpToPx(miniPlayerHeight + 8))
     }
 }

@@ -24,13 +24,14 @@ import javax.inject.Inject
 class PlayerService : MediaLibraryService() {
     @Inject
     lateinit var audiobookUseCases: AudiobookUseCases
+
     @Inject
     lateinit var playbackUseCases: PlaybackUseCases
 
 
     private lateinit var player: ExoPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
-    private val librarySessionCallback = CustomMediaLibrarySessionCallback(::setMediaItemFromSearchQuery)
+
 
     companion object {
         const val SEARCH_QUERY_PREFIX_COMPAT = "androidx://media3-session/playFromSearch"
@@ -40,7 +41,6 @@ class PlayerService : MediaLibraryService() {
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {
         return mediaLibrarySession
     }
-
 
 
     override fun onCreate() {
@@ -55,7 +55,6 @@ class PlayerService : MediaLibraryService() {
     }
 
 
-
     @SuppressLint("UnsafeOptInUsageError")
     private fun initializeSessionAndPlayer() {
         player = ExoPlayer.Builder(this)
@@ -64,6 +63,11 @@ class PlayerService : MediaLibraryService() {
 
         playbackUseCases.initizialize.mediaItemTree(audiobookUseCases.getBooksWithInfo)
 
+        val librarySessionCallback = CustomMediaLibrarySessionCallback(
+            ::setMediaItemFromSearchQuery,
+            audiobookUseCases,
+            playbackUseCases
+        )
 
         mediaLibrarySession =
             MediaLibrarySession.Builder(this, player, librarySessionCallback)

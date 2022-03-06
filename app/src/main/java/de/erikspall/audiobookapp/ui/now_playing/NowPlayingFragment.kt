@@ -20,4 +20,8 @@ class NowPlayingFragment : Fragment(){
         val root: View = binding.root
         return root
     }
+
+    private fun setupObservers(){
+
+    }
 }
