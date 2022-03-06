@@ -1,6 +1,7 @@
 package de.erikspall.audiobookapp.data.repository.player_controller
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
@@ -106,6 +107,31 @@ class PlayerControllerRepositoryImpl (
 
     override fun seekTo(chapterIndex: Int, position: Long) {
         getController()?.seekTo(chapterIndex, position) ?: return
+    }
+
+    override fun seekTo(position: Long) {
+        getController()?.seekTo(position)
+    }
+
+    override fun getCurrentBookDuration(): Long {
+        val rawId =  getCurrentMediaItem().mediaId
+        val index = rawId.indexOf("[", 1)
+        return if (index != -1){
+            val mediaIdOfBook = rawId.substring(0, index)
+            getMediaTree().getItem(mediaIdOfBook)?.mediaMetadata?.extras?.getLong(
+                METADATA_KEY_DURATION) ?: 1
+        } else
+            1
+
+    }
+
+    override fun getDurationOfBook(uri: Uri): Long {
+        return getMediaTree().getDurationOfBook(uri)
+    }
+
+    override fun getDurationOfChapter(mediaId: String): Long {
+        return getMediaTree().getItem(mediaId)?.mediaMetadata?.extras?.getLong(
+            METADATA_KEY_DURATION) ?: 1
     }
 
     override fun play(chapters: List<MediaItem>, fromStart: Boolean, lastPosition: Long) {

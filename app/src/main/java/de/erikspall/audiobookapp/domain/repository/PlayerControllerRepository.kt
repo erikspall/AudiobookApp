@@ -1,5 +1,6 @@
 package de.erikspall.audiobookapp.domain.repository
 
+import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
@@ -29,4 +30,8 @@ interface PlayerControllerRepository {
     fun play(chapters: List<MediaItem>, fromStart: Boolean, lastPosition: Long)
     fun currentMediaItemCount(): Int
     fun seekTo(chapterIndex: Int, position: Long)
+    fun seekTo(position: Long)
+    fun getCurrentBookDuration(): Long
+    fun getDurationOfBook(uri: Uri): Long
+    fun getDurationOfChapter(mediaId: String): Long
 }

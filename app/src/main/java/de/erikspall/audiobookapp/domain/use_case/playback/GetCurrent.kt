@@ -41,6 +41,11 @@ class GetCurrent(
         return repository.getCurrentChapterDuration()
     }
 
+
+    fun bookDuration(): Long {
+        return repository.getCurrentBookDuration()
+    }
+
     fun positionInBook(): Long {
         return repository.getCurrentPositionInBook()
     }
@@ -52,6 +57,26 @@ class GetCurrent(
 
     fun positionInChapter(): Long {
         return repository.getCurrentPositionInChapter()
+    }
+
+    fun progressInBigPercent(): Int {
+        return ((positionInChapter()
+            .toDouble() / chapterDuration()) * 1000).toInt()
+    }
+
+    fun progressInBigPercent(chapterDuration: Long): Int {
+        return ((positionInChapter()
+            .toDouble() / chapterDuration) * 1000).toInt()
+    }
+
+    fun bookProgressInBigPercent(): Int {
+        return ((positionInBook()
+            .toDouble() / bookDuration()) * 1000).toInt()
+    }
+
+    fun bookProgressInBigPercent(bookDuration: Long): Int {
+        return ((positionInBook()
+            .toDouble() / bookDuration) * 1000).toInt()
     }
 
     @SuppressLint("UnsafeOptInUsageError")

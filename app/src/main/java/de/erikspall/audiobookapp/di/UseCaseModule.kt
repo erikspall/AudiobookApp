@@ -35,7 +35,9 @@ object UseCaseModule {
             releaseController = ReleaseController(repository),
             addListener = AddListener(repository),
             getCurrent = GetCurrent(repository),
-            state = State(repository)
+            state = State(repository),
+            seekTo = SeekTo(repository),
+            skip = Skip(repository)
         )
     }
 }

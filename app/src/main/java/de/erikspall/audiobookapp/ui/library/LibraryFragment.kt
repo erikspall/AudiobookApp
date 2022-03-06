@@ -161,7 +161,7 @@ class LibraryFragment : Fragment() {
         binding.miniPlayer.container.visibility = View.VISIBLE
         binding.miniPlayerBackground.visibility = View.VISIBLE
         binding.miniPlayer.currentBookProgress.isIndeterminate = false
-        binding.miniPlayer.currentBookProgress.setProgress(playerViewModel.progressBig(), false)
+        //binding.miniPlayer.currentBookProgress.setProgress(playerViewModel.progressBig(), false)
         Log.d("Library", "Loading metadata: ${metaData.title}")
         Glide.with(requireContext())
             .load(metaData.artworkUri)

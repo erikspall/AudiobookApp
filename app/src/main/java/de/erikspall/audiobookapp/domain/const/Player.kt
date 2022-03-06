@@ -30,4 +30,7 @@ object Player {
 
     /** State indicating this item is currently playing. */
     const val STATE_PLAYING = -3
+
+    /** ms to seek */
+    const val SEEK_INCREMENT = 30000L
 }

@@ -68,7 +68,7 @@ object MediaItemTree {
         coverUri: Uri? = null,
         startTime: Long? = null,
         endTime: Long? = null,
-        chapterDuration: Bundle? = null
+        duration: Bundle? = null
     ): MediaItem {
         val clippingConfiguration = MediaItem.ClippingConfiguration.Builder()
             .setStartPositionMs(startTime ?: 0)
@@ -84,7 +84,7 @@ object MediaItemTree {
             .setArtworkUri(coverUri)
             .setAlbumArtist(narrator)
             .setMediaUri(sourceUri)
-            .setExtras(chapterDuration)
+            .setExtras(duration)
             .build()
         return MediaItem.Builder()
             .setMediaId(mediaId)
@@ -210,6 +210,13 @@ object MediaItemTree {
         // currently only library exists
         val id = book.audiobook.audiobookId
         val bookFolderIdInTree = BOOK_PREFIX + id
+
+        val duration: Bundle = Bundle()
+        duration.putLong(
+            METADATA_KEY_DURATION,
+            book.audiobook.duration
+        )
+
         // Create Book in Tree
         if (!treeNodes.containsKey(bookFolderIdInTree)) {
             treeNodes[bookFolderIdInTree] =
@@ -222,7 +229,8 @@ object MediaItemTree {
                         narrator = book.narrator.toString(),
                         genre = (book.genres.getOrNull(0) ?: "No genre").toString(),
                         folderType = FOLDER_TYPE_PLAYLISTS,
-                        coverUri = book.audiobook.coverUri.toUri()
+                        coverUri = book.audiobook.coverUri.toUri(),
+                        duration = duration
                     )
                 )
             // Add book to all needed folders
@@ -299,7 +307,7 @@ object MediaItemTree {
                             folderType = FOLDER_TYPE_NONE,
                             startTime = (chapter.start_time.toDouble() * 1000).toLong(),
                             endTime = (chapter.end_time.toDouble() * 1000).toLong(),
-                            chapterDuration = duration
+                            duration = duration
                         )
                     )
                 treeNodes[bookFolderIdInTree]!!.addChild(chapterIdInTree)
@@ -351,6 +359,15 @@ object MediaItemTree {
 
     fun getBookFromUri(uri: Uri): MediaItem? {
         return bookUriMap[uri]?.item
+    }
+
+    fun getDurationOfBook(uri: Uri): Long {
+        return getBookFromUri(uri)?.mediaMetadata?.extras?.getLong(
+            METADATA_KEY_DURATION) ?: 1
+    }
+
+    fun getDurationOfChapter(mediaId: String): Long {
+        return getItem(mediaId)?.mediaMetadata?.extras?.getLong(METADATA_KEY_DURATION) ?: 1
     }
 
     fun getBooksOfPerson(personId: Int): List<MediaItem> {

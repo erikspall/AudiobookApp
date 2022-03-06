@@ -7,5 +7,7 @@ data class PlaybackUseCases (
     val releaseController: ReleaseController,
     val addListener: AddListener,
     val getCurrent: GetCurrent,
-    val state: State
+    val state: State,
+    val seekTo: SeekTo,
+    val skip: Skip
 )

@@ -7,5 +7,4 @@ sealed class PlayerEvent {
     data class StartPlayback(val audiobook: Audiobook): PlayerEvent()
     object LibraryWentToBackground: PlayerEvent()
     object LibraryWentToForeground: PlayerEvent()
-    object SavePosition: PlayerEvent()
 }

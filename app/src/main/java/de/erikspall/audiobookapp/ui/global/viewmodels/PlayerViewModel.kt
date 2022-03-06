@@ -49,7 +49,7 @@ class PlayerViewModel @Inject constructor(
             state.isPlaying = playbackUseCases.state.isPlaying()
             state.mediaMetadata.value = (playbackUseCases.getCurrent.mediaMetaData())
             //state.isPrepared.postValue(playbackUseCases.state.isPrepared())
-            state.sliderProgress.postValue(progressBig())
+            state.sliderProgress.postValue(playbackUseCases.getCurrent.progressInBigPercent())
 
             if (playbackUseCases.state.isPlaying()) {
                 state.currentlyPlayingBookId = (playbackUseCases.getCurrent.bookId())
@@ -151,15 +151,10 @@ class PlayerViewModel @Inject constructor(
             }
     }
 
-    fun progressBig(): Int {
-        return ((playbackUseCases.getCurrent.positionInChapter()
-            .toDouble() / playbackUseCases.getCurrent.chapterDuration()) * 1000).toInt()
-    }
-
     // Progress of mini-player
     private fun keepChapterProgressUpdated() {
         handler.postDelayed({
-            state.sliderProgress.postValue(progressBig())
+            state.sliderProgress.postValue(playbackUseCases.getCurrent.progressInBigPercent())
             keepChapterProgressUpdated()
         }, 300)
     }
