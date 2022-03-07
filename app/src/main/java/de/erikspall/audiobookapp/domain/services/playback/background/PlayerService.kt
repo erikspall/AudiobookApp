@@ -1,5 +1,6 @@
 package de.erikspall.audiobookapp.domain.services.playback.background
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
@@ -8,6 +9,7 @@ import android.content.Intent.ACTION_MAIN
 import android.content.Intent.CATEGORY_LAUNCHER
 import android.net.Uri
 import android.os.Build
+import androidx.core.animation.doOnEnd
 import androidx.media3.common.AudioAttributes
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaLibraryService
@@ -69,8 +71,17 @@ class PlayerService : MediaLibraryService() {
                             playbackUseCases.getCurrent.positionInBook(player)
                         )
                     }
-                    player.pause()
-                    stopSelf()
+                    val fadeOut = ValueAnimator.ofFloat(1f, 0f)
+                    fadeOut.duration = 10000
+                    fadeOut.addUpdateListener {
+                        player.volume = it.animatedValue as Float
+                    }
+                    fadeOut.doOnEnd {
+                        player.pause()
+                        player.volume = 1f
+                        stopSelf()
+                    }
+                    fadeOut.start()
                 }
             }
         }

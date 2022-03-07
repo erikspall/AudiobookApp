@@ -115,6 +115,7 @@ class CustomMediaLibrarySessionCallback(
                 }
             }
             Player.COMMAND_STOP -> {
+                Log.d("PlayerCommand", "Stop requested")
                 val book = (session.player.currentMediaItem?.mediaMetadata?.mediaUri ?: Uri.EMPTY).toString()
                 MainScope().launch {
                     audiobookUseCases.savePosition(
