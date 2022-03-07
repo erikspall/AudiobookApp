@@ -1,8 +1,10 @@
 package de.erikspall.audiobookapp.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import de.erikspall.audiobookapp.domain.repository.AppRepository
 import de.erikspall.audiobookapp.domain.repository.PlayerControllerRepository
@@ -27,7 +29,7 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun providePlaybackUseCases(repository: PlayerControllerRepository): PlaybackUseCases {
+    fun providePlaybackUseCases(repository: PlayerControllerRepository, @ApplicationContext appContext: Context): PlaybackUseCases {
         return PlaybackUseCases(
             togglePlayback = TogglePlayback(repository),
             playBook = PlayBook(repository),
@@ -37,7 +39,8 @@ object UseCaseModule {
             getCurrent = GetCurrent(repository),
             state = State(repository),
             seekTo = SeekTo(repository),
-            skip = Skip(repository)
+            skip = Skip(repository),
+            sleepTimer = SleepTimer(appContext)
         )
     }
 }

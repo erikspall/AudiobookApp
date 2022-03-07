@@ -2,6 +2,7 @@ package de.erikspall.audiobookapp.ui.now_playing.viewmodel
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.erikspall.audiobookapp.domain.const.Player.SEEK_INCREMENT
@@ -64,11 +65,12 @@ class NowPlayingViewModel @Inject constructor(
     }
 
     private fun updateMetadata(){
+        Log.d("LiveData-NowPlaying", "Updating Static Info")
         val metaData = playbackUseCases.getCurrent.mediaMetaData()
         state.static.value = StaticInfo(
             bookTitle = metaData.albumTitle.toString(),
             chapterTitle = metaData.title.toString(),
-            chapterDuration = playbackUseCases.getCurrent.chapterDuration(),
+            chapterDuration = playbackUseCases.getCurrent.chapterDuration(), // Could be calc directly
             bookDuration = playbackUseCases.getCurrent.bookDuration()
         )
     }
@@ -79,10 +81,12 @@ class NowPlayingViewModel @Inject constructor(
             resumePositionUpdates()
             resumeChapterSliderUpdates()
             resumeBookSliderUpdates()
+
         }
     }
 
     private fun resumePositionUpdates() {
+        Log.d("LiveData-NowPlaying", "Resuming Position Updates")
         // Show values before delay
         state.position.value = PositionInfo(
             bookPosition = playbackUseCases.getCurrent.positionInBook(),
@@ -92,6 +96,7 @@ class NowPlayingViewModel @Inject constructor(
     }
 
     private fun resumeChapterSliderUpdates() {
+        Log.d("LiveData-NowPlaying", "Resuming chapter-slider Updates")
         var progress = playbackUseCases.getCurrent.positionInChapter().toFloat()
         val chapterDuration = playbackUseCases.getCurrent.chapterDuration().toFloat()
         if (progress < 0f)
@@ -103,6 +108,7 @@ class NowPlayingViewModel @Inject constructor(
     }
 
     private fun resumeBookSliderUpdates(){
+        Log.d("LiveData-NowPlaying", "Resuming book-slider Updates")
         state.bookProgressValue.value = playbackUseCases.getCurrent.bookProgressInBigPercent(state.static.value?.bookDuration ?: 1)
         keepBookProgressUpdated()
     }
@@ -110,6 +116,7 @@ class NowPlayingViewModel @Inject constructor(
     private fun stopAllUpdates(){
         isUpdating = false
         handler.removeCallbacksAndMessages(null)
+        Log.d("LiveData-NowPlaying", "Stopping Updates")
     }
 
     private fun keepPositionsUpdated() {

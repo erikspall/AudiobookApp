@@ -151,7 +151,8 @@
         app:srcCompat="@drawable/ic_forward_30"
         app:layout_constraintStart_toEndOf="@id/fab_play"
         app:layout_constraintTop_toTopOf="@id/fab_play"
-        app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
+        app:layout_constraintBottom_toBottomOf="@id/fab_play"
+        app:elevation="0dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_backward"
@@ -163,7 +164,8 @@
         app:srcCompat="@drawable/ic_backward_30"
         app:layout_constraintEnd_toStartOf="@id/fab_play"
         app:layout_constraintTop_toTopOf="@id/fab_play"
-        app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
+        app:layout_constraintBottom_toBottomOf="@id/fab_play"
+        app:elevation="0dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_go_back"
@@ -175,7 +177,8 @@
         app:srcCompat="@drawable/ic_skip_backward"
         app:layout_constraintEnd_toStartOf="@id/fab_backward"
         app:layout_constraintTop_toTopOf="@id/fab_play"
-        app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
+        app:layout_constraintBottom_toBottomOf="@id/fab_play"
+        app:elevation="0dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_skip"
@@ -187,7 +190,8 @@
         app:srcCompat="@drawable/ic_skip_forward"
         app:layout_constraintStart_toEndOf="@id/fab_forward"
         app:layout_constraintTop_toTopOf="@id/fab_play"
-        app:layout_constraintBottom_toBottomOf="@id/fab_play"/>
+        app:layout_constraintBottom_toBottomOf="@id/fab_play"
+        app:elevation="0dp"/>
 
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout

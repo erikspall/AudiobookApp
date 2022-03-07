@@ -1,6 +1,7 @@
 package de.erikspall.audiobookapp.ui.now_playing
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentPlayerBinding
 import de.erikspall.audiobookapp.domain.const.Player
+import de.erikspall.audiobookapp.domain.const.Tags.TAG_SLEEPTIMER
 import de.erikspall.audiobookapp.domain.util.TimeFormatter
+import de.erikspall.audiobookapp.ui.bottomsheets.sleep_timer.SleepTimerSheet
 import de.erikspall.audiobookapp.ui.global.listeners.SliderListener
 import de.erikspall.audiobookapp.ui.global.viewmodels.PlayerViewModel
 import de.erikspall.audiobookapp.ui.now_playing.event.NowPlayingEvent
@@ -61,6 +64,7 @@ class NowPlayingFragment : Fragment() {
                 }
                 Player.STATE_PAUSED -> {
                     // Update icons
+                    Log.d("LiveData-NowPlaying", "Player paused!")
                     viewModel.onEvent(NowPlayingEvent.OnPause)
                     binding.fabPlay.setImageDrawable(
                         ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_play)
@@ -68,6 +72,7 @@ class NowPlayingFragment : Fragment() {
                 }
                 Player.STATE_PLAYING -> {
                     // Update icons
+                    Log.d("LiveData-NowPlaying", "Player playing!")
                     viewModel.onEvent(NowPlayingEvent.OnPlay)
                     binding.fabPlay.setImageDrawable(
                         ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_pause)
@@ -126,6 +131,20 @@ class NowPlayingFragment : Fragment() {
         binding.playerToolbar.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
+        binding.bottomAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.sleep_timer_button -> {
+                    SleepTimerSheet().show(
+                        requireActivity().supportFragmentManager,
+                        TAG_SLEEPTIMER
+                    )
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
+        }
     }
 
     private fun setupInsets() {
@@ -144,6 +163,7 @@ class NowPlayingFragment : Fragment() {
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
             .placeholder(R.drawable.ic_image)
             .into(binding.bookImage)
+        Log.d("LiveData-NowPlaying", "Loading Cover")
         //binding.bookName.text = data.albumTitle
         //binding.chapterName.text = data.title
 

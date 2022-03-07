@@ -18,7 +18,7 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/sleep_timer"
         style="@style/MaterialAlertDialog.Material3.Title.Text"/>
-    <com.google.android.material.button.MaterialButtonToggleGroup
+    <!--<com.google.android.material.button.MaterialButtonToggleGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -40,7 +40,7 @@
         style="?attr/materialButtonOutlinedStyle"
         />
 
-    </com.google.android.material.button.MaterialButtonToggleGroup>
+    </com.google.android.material.button.MaterialButtonToggleGroup> -->
 
     <TimePicker
         android:id="@+id/picker"
@@ -59,25 +59,31 @@
         android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
         android:layout_gravity="center_horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="32dp"
         tools:text="Playback will stop in 5 hours and 2 minutes"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="right">
+        android:layout_gravity="bottom">
         <Button
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/ThemeOverlay.Material3.Button.TextButton"
+            android:layout_gravity="left"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:text="@string/cancel_button"/>
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
         <Button
             android:id="@+id/set_button"
             android:layout_width="wrap_content"
+            android:layout_gravity="right"
             android:layout_height="wrap_content"
-            style="@style/ThemeOverlay.Material3.Button.TextButton"
+            style="@style/Widget.Material3.Button"
             android:text="@string/set_button"/>
     </LinearLayout>
 </LinearLayout>

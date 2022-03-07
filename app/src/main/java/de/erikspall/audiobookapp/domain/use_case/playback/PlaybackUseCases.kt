@@ -9,5 +9,6 @@ data class PlaybackUseCases (
     val getCurrent: GetCurrent,
     val state: State,
     val seekTo: SeekTo,
-    val skip: Skip
+    val skip: Skip,
+    val sleepTimer: SleepTimer
 )
