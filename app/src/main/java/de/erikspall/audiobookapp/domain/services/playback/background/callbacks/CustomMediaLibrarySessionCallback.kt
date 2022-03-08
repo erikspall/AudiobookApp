@@ -103,7 +103,7 @@ class CustomMediaLibrarySessionCallback(
                 if (session.player.isPlaying) {
                     Log.d("PlayerCommand", "Pause requested")
                     // Pause is requested -> Save progress
-                    val bookId = playbackUseCases.getCurrent.bookId()
+                    val bookId = playbackUseCases.getCurrent.bookId() //TODO: Does not work, when controller dead?
                     val chapterId = playbackUseCases.getCurrent.chapterId()
                     val pos = playbackUseCases.getCurrent.positionInBook(session.player)
                     MainScope().launch {

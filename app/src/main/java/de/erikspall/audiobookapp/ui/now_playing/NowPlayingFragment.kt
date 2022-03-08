@@ -37,6 +37,8 @@ class NowPlayingFragment : Fragment() {
     private val viewModel: NowPlayingViewModel by viewModels()
     private val playerViewModel: PlayerViewModel by activityViewModels()
 
+    private var justStarted = true
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,15 +68,19 @@ class NowPlayingFragment : Fragment() {
                 }
                 Player.STATE_PAUSED -> {
                     // Update icons
-                    Log.d("LiveData-NowPlaying", "Player paused!")
-                    viewModel.onEvent(NowPlayingEvent.OnPause)
+                    Log.d("NowPlaying", "Player paused!")
+                    if (justStarted){
+                        justStarted = false
+                        viewModel.onEvent(NowPlayingEvent.StartedInPause)
+                    } else
+                        viewModel.onEvent(NowPlayingEvent.OnPause)
                     binding.fabPlay.setImageDrawable(
                         ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_play)
                     )
                 }
                 Player.STATE_PLAYING -> {
                     // Update icons
-                    Log.d("LiveData-NowPlaying", "Player playing!")
+                    Log.d("NowPlaying", "Player playing!")
                     viewModel.onEvent(NowPlayingEvent.OnPlay)
                     binding.fabPlay.setImageDrawable(
                         ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_pause)
@@ -95,8 +101,6 @@ class NowPlayingFragment : Fragment() {
         }
 
         viewModel.state.chapterSliderValue.observe(viewLifecycleOwner) { value ->
-            // TODO: Check if value is in bounds
-
                 binding.chapterSlider.value = value.toFloat()
 
 

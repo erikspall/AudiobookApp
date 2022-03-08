@@ -12,5 +12,5 @@ sealed class NowPlayingEvent {
     object SkipBackward: NowPlayingEvent()
     object SeekForward: NowPlayingEvent()
     object SeekBackward: NowPlayingEvent()
-
+    object StartedInPause: NowPlayingEvent()
 }

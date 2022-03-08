@@ -34,7 +34,7 @@ class NowPlayingViewModel @Inject constructor(
             is NowPlayingEvent.SliderDragged -> {
                 state.sliderIsBeingDragged = event.isBeingDragged
                 //if (!state.sliderIsBeingDragged)
-                    //resumeChapterSliderUpdates()
+                //resumeChapterSliderUpdates()
             }
             is NowPlayingEvent.OnPlay -> {
                 updateMetadata()
@@ -61,12 +61,17 @@ class NowPlayingViewModel @Inject constructor(
             is NowPlayingEvent.SeekBackward -> {
                 playbackUseCases.skip.backward(SEEK_INCREMENT)
             }
+            is NowPlayingEvent.StartedInPause -> {
+                updateMetadata()
+                resumeAllUpdates(onlyOnce = true)
+            }
         }
     }
 
-    private fun updateMetadata(){
-        Log.d("LiveData-NowPlaying", "Updating Static Info")
+    private fun updateMetadata() {
+        Log.d("NowPlaying", "Updating Static Info")
         val metaData = playbackUseCases.getCurrent.mediaMetaData()
+        Log.d("NowPlayingViewModel", "Updating Metadata ${metaData.title}")
         state.static.value = StaticInfo(
             bookTitle = metaData.albumTitle.toString(),
             chapterTitle = metaData.title.toString(),
@@ -75,28 +80,28 @@ class NowPlayingViewModel @Inject constructor(
         )
     }
 
-    private fun resumeAllUpdates() {
+    private fun resumeAllUpdates(onlyOnce: Boolean = false) {
         if (!isUpdating) {
-            isUpdating = true
-            resumePositionUpdates()
-            resumeChapterSliderUpdates()
-            resumeBookSliderUpdates()
+            isUpdating = !onlyOnce
+            resumePositionUpdates(onlyOnce)
+            resumeChapterSliderUpdates(onlyOnce)
+            resumeBookSliderUpdates(onlyOnce)
 
         }
     }
 
-    private fun resumePositionUpdates() {
-        Log.d("LiveData-NowPlaying", "Resuming Position Updates")
+    private fun resumePositionUpdates(onlyOnce: Boolean = false) {
+
         // Show values before delay
         state.position.value = PositionInfo(
             bookPosition = playbackUseCases.getCurrent.positionInBook(),
             chapterPosition = playbackUseCases.getCurrent.positionInChapter()
         )
-        keepPositionsUpdated()
+        if (!onlyOnce)
+            keepPositionsUpdated()
     }
 
-    private fun resumeChapterSliderUpdates() {
-        Log.d("LiveData-NowPlaying", "Resuming chapter-slider Updates")
+    private fun resumeChapterSliderUpdates(onlyOnce: Boolean = false) {
         var progress = playbackUseCases.getCurrent.positionInChapter()
         //val chapterDuration = playbackUseCases.getCurrent.chapterDuration()
         /*if (progress < 0)
@@ -104,16 +109,19 @@ class NowPlayingViewModel @Inject constructor(
         else if (progress > chapterDuration)
             progress = chapterDuration*/
         state.chapterSliderValue.value = progress
-        keepChapterSliderUpdated()
+        if (!onlyOnce)
+            keepChapterSliderUpdated()
     }
 
-    private fun resumeBookSliderUpdates(){
-        Log.d("LiveData-NowPlaying", "Resuming book-slider Updates")
-        state.bookProgressValue.value = playbackUseCases.getCurrent.bookProgressInBigPercent(state.static.value?.bookDuration ?: 1)
-        keepBookProgressUpdated()
+    private fun resumeBookSliderUpdates(onlyOnce: Boolean = false) {
+        state.bookProgressValue.value = playbackUseCases.getCurrent.bookProgressInBigPercent(
+            state.static.value?.bookDuration ?: 1
+        )
+        if (!onlyOnce)
+            keepBookProgressUpdated()
     }
 
-    private fun stopAllUpdates(){
+    private fun stopAllUpdates() {
         isUpdating = false
         handler.removeCallbacksAndMessages(null)
         Log.d("LiveData-NowPlaying", "Stopping Updates")
@@ -140,7 +148,9 @@ class NowPlayingViewModel @Inject constructor(
 
     private fun keepBookProgressUpdated() {
         handler.postDelayed({
-            state.bookProgressValue.value = playbackUseCases.getCurrent.bookProgressInBigPercent(state.static.value?.bookDuration ?: 1)
+            state.bookProgressValue.value = playbackUseCases.getCurrent.bookProgressInBigPercent(
+                state.static.value?.bookDuration ?: 1
+            )
             keepBookProgressUpdated()
         }, 1000)
     }
