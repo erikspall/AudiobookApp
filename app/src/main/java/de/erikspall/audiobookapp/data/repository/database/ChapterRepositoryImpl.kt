@@ -42,7 +42,7 @@ class ChapterRepositoryImpl(
         return chapterDao.chapterExists(title, start, start_time, end, end_time)
     }
 
-    override suspend fun getChaptersOfAudiobook(audiobookId: Long): List<Chapter> {
+    override fun getChaptersOfAudiobook(audiobookId: Long): Flow<List<Chapter>> {
         return chapterDao.getChaptersOfAudiobook(audiobookId)
     }
 

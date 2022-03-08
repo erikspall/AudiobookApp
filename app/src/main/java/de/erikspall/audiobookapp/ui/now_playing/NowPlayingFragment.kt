@@ -19,8 +19,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentPlayerBinding
 import de.erikspall.audiobookapp.domain.const.Player
+import de.erikspall.audiobookapp.domain.const.Tags.TAG_CHAPTERS
 import de.erikspall.audiobookapp.domain.const.Tags.TAG_SLEEPTIMER
 import de.erikspall.audiobookapp.domain.util.TimeFormatter
+import de.erikspall.audiobookapp.ui.bottomsheets.chapters.ChaptersSheet
 import de.erikspall.audiobookapp.ui.bottomsheets.sleep_timer.SleepTimerSheet
 import de.erikspall.audiobookapp.ui.global.listeners.SliderListener
 import de.erikspall.audiobookapp.ui.global.viewmodels.PlayerViewModel
@@ -94,12 +96,9 @@ class NowPlayingFragment : Fragment() {
 
         viewModel.state.chapterSliderValue.observe(viewLifecycleOwner) { value ->
             // TODO: Check if value is in bounds
-            if (value >= 0.0f && value < binding.chapterSlider.valueTo)
-                binding.chapterSlider.value = value
-            else {
-                Log.d("NowPlayingFragment", "Chapter slider value out of bounds! value: $value to: ${binding.chapterSlider.valueTo}")
-                binding.chapterSlider.value = 0.0f
-            }
+
+                binding.chapterSlider.value = value.toFloat()
+
 
 
         }
@@ -144,6 +143,13 @@ class NowPlayingFragment : Fragment() {
                     SleepTimerSheet().show(
                         requireActivity().supportFragmentManager,
                         TAG_SLEEPTIMER
+                    )
+                    true
+                }
+                R.id.chapter_button -> {
+                    ChaptersSheet().show(
+                        requireActivity().supportFragmentManager,
+                        TAG_CHAPTERS
                     )
                     true
                 }

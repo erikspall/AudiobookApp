@@ -8,7 +8,7 @@ data class NowPlayingState (
     val static: MutableLiveData<StaticInfo> = MutableLiveData(StaticInfo()),
     val position: MutableLiveData<PositionInfo> = MutableLiveData(PositionInfo()),
     val currentCover: MutableLiveData<Uri> = MutableLiveData(Uri.EMPTY),
-    val chapterSliderValue: MutableLiveData<Float> = MutableLiveData(0f),
+    val chapterSliderValue: MutableLiveData<Long> = MutableLiveData(0),
     val bookProgressValue: MutableLiveData<Int> = MutableLiveData(0),
     var sliderIsBeingDragged: Boolean = false,
 )

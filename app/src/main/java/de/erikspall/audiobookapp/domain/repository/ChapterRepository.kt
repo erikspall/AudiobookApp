@@ -19,7 +19,7 @@ interface ChapterRepository {
 
     suspend fun chapterExists(title: String, start: Double, start_time: String, end: Double, end_time: String): Boolean
 
-    suspend fun getChaptersOfAudiobook(audiobookId: Long): List<Chapter>
+    fun getChaptersOfAudiobook(audiobookId: Long): Flow<List<Chapter>>
 
     suspend fun setChapterIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean = false)
 }

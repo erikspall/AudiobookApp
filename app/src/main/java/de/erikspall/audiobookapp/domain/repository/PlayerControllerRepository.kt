@@ -7,6 +7,7 @@ import androidx.media3.session.MediaController
 import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTree
 import de.erikspall.audiobookapp.domain.model.AudiobookWithInfo
 import de.erikspall.audiobookapp.domain.use_case.audiobook.GetBooksWithInfo
+import kotlinx.coroutines.flow.Flow
 
 interface PlayerControllerRepository {
     fun getMediaTree(): MediaItemTree

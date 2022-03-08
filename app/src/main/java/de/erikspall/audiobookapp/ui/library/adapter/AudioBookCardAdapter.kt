@@ -39,7 +39,7 @@ class AudioBookCardAdapter(
      * Init view elements
      */
     abstract class AudiobookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        abstract fun bind(audiobookWithPersons: AudiobookWithPersons, position: Int)
+        abstract fun bind(audiobookWithPersons: AudiobookWithPersons)
     }
 
 
@@ -57,7 +57,7 @@ class AudioBookCardAdapter(
             view.findViewById(R.id.book_progress_indicator)
         val playButton: FloatingActionButton = view.findViewById(R.id.play_button)
 
-        override fun bind(audiobookWithPersons: AudiobookWithPersons, position: Int) {
+        override fun bind(audiobookWithPersons: AudiobookWithPersons) {
             Glide.with(context!!)
                 .load(audiobookWithPersons.audiobook.coverUri)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
@@ -107,7 +107,7 @@ class AudioBookCardAdapter(
         val book_author: TextView = view.findViewById(R.id.book_author)
         val book_duration: TextView = view.findViewById(R.id.book_duration)
 
-        override fun bind(audiobookWithPersons: AudiobookWithPersons, position: Int) {
+        override fun bind(audiobookWithPersons: AudiobookWithPersons) {
             Glide.with(context!!)
                 .load(audiobookWithPersons.audiobook.coverUri)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
@@ -159,8 +159,7 @@ class AudioBookCardAdapter(
         4. Set author for current book
         5. Set progress for current book
          */
-        val current = getItem(position)
-        holder.bind(current, position)
+        holder.bind(getItem(position))
         //idToViewHolder[current.audiobook.audiobookId] = holder
     }
 

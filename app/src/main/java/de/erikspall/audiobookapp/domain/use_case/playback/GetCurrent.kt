@@ -8,7 +8,9 @@ import androidx.media3.common.Player
 import de.erikspall.audiobookapp.domain.const.MediaTreeConst.BOOK_PREFIX
 import de.erikspall.audiobookapp.domain.const.MediaTreeConst.METADATA_BOOK_ID
 import de.erikspall.audiobookapp.domain.const.MediaTreeConst.METADATA_CHAPTER_ID
+import de.erikspall.audiobookapp.domain.model.Chapter
 import de.erikspall.audiobookapp.domain.repository.PlayerControllerRepository
+import kotlinx.coroutines.flow.Flow
 
 class GetCurrent(
     private val repository: PlayerControllerRepository

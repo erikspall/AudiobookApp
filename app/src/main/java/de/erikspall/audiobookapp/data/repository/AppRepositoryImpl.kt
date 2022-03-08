@@ -56,6 +56,10 @@ class AppRepositoryImpl(
         return allAudiobooksWithInfo
     }
 
+    override fun getChaptersOfAudiobook(audiobookId: Long): Flow<List<Chapter>> {
+        return chapterRepo.getChaptersOfAudiobook(audiobookId)
+    }
+
     override suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean) {
         audiobookRepo.setPosition(audiobookId, position, isPlaying)
     }

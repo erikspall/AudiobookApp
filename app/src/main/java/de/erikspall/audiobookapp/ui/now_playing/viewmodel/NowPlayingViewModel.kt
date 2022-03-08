@@ -97,12 +97,12 @@ class NowPlayingViewModel @Inject constructor(
 
     private fun resumeChapterSliderUpdates() {
         Log.d("LiveData-NowPlaying", "Resuming chapter-slider Updates")
-        var progress = playbackUseCases.getCurrent.positionInChapter().toFloat()
-        val chapterDuration = playbackUseCases.getCurrent.chapterDuration().toFloat()
-        if (progress < 0f)
-            progress = 0f
+        var progress = playbackUseCases.getCurrent.positionInChapter()
+        //val chapterDuration = playbackUseCases.getCurrent.chapterDuration()
+        /*if (progress < 0)
+            progress = 0
         else if (progress > chapterDuration)
-            progress = chapterDuration
+            progress = chapterDuration*/
         state.chapterSliderValue.value = progress
         keepChapterSliderUpdated()
     }
@@ -132,7 +132,7 @@ class NowPlayingViewModel @Inject constructor(
     private fun keepChapterSliderUpdated() {
         handler.postDelayed({
             if (!state.sliderIsBeingDragged) {
-                state.chapterSliderValue.value = playbackUseCases.getCurrent.positionInChapter().toFloat()
+                state.chapterSliderValue.value = playbackUseCases.getCurrent.positionInChapter()
                 keepChapterSliderUpdated()
             }
         }, 100)

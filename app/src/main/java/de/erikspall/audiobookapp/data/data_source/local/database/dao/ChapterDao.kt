@@ -28,7 +28,7 @@ interface ChapterDao {
     suspend fun chapterExists(title: String, start: Double, start_time: String, end: Double, end_time: String): Boolean
 
     @Query("SELECT * FROM chapter WHERE chapter.audiobookId = :audiobookId ORDER BY chapter.start ASC")
-    suspend fun getChaptersOfAudiobook(audiobookId: Long): List<Chapter>
+    fun getChaptersOfAudiobook(audiobookId: Long): Flow<List<Chapter>>
 
     @Query("UPDATE chapter SET isPlaying = :isPlaying WHERE audiobookId = :audiobookId AND chapterId = :chapterId")
     suspend fun setChapterIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean)

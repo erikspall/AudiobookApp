@@ -92,8 +92,9 @@
     <com.google.android.material.slider.Slider
         android:valueFrom="0"
         android:valueTo="1000"
-        
+        android:stepSize="1"
         android:id="@+id/chapter_slider"
+        app:tickVisible="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/book_name"
