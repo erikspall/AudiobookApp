@@ -6,7 +6,6 @@ import de.erikspall.audiobookapp.domain.model.AudiobookWithPersons
 import kotlinx.coroutines.flow.Flow
 
 interface AudiobookRepository {
-
     fun getAudiobooks(): Flow<List<Audiobook>>
 
     fun getAudiobooksWithPersons(): Flow<List<AudiobookWithPersons>>
@@ -29,5 +28,5 @@ interface AudiobookRepository {
 
     suspend fun deleteAll()
 
-    suspend fun setPosition(bookUri: String, position: Long)
+    suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean = false)
 }

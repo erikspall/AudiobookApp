@@ -29,4 +29,7 @@ interface ChapterDao {
 
     @Query("SELECT * FROM chapter WHERE chapter.audiobookId = :audiobookId ORDER BY chapter.start ASC")
     suspend fun getChaptersOfAudiobook(audiobookId: Long): List<Chapter>
+
+    @Query("UPDATE chapter SET isPlaying = :isPlaying WHERE audiobookId = :audiobookId AND chapterId = :chapterId")
+    suspend fun setIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean)
 }

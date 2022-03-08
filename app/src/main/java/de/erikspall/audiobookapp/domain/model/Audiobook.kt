@@ -33,7 +33,8 @@ data class Audiobook(
     val duration: Long,
     val authorId: Long? = null,
     val narratorId: Long? = null,
-    val position: Long
+    val position: Long,
+    val isPlaying: Boolean = false
     /* more meta data can go here */
 ) {
     override fun equals(other: Any?): Boolean {
@@ -45,22 +46,28 @@ data class Audiobook(
                     && this.duration == other.duration
                     && this.authorId == other.authorId
                     && this.narratorId == other.narratorId
-                    && this.position == other.position)
+                    && this.position == other.position
+                    && this.isPlaying == other.isPlaying)
         } else {
             false
         }
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(this.audiobookId, this.uri, this.coverUri, this.title, this.duration, this.authorId, this.narratorId, this.position)
+        return Objects.hash(
+            this.audiobookId,
+            this.uri,
+            this.coverUri,
+            this.title,
+            this.duration,
+            this.authorId,
+            this.narratorId,
+            this.position,
+            this.isPlaying
+        )
     }
 
     override fun toString(): String {
-        return "Audiobook{\n\tUri: $uri,\n" +
-                "\tCover: $coverUri,\n" +
-                "\tTitle: $title,\n" +
-                "\tDuration: $duration,\n" +
-                "\tPosition: $position\n" +
-                "}"
+        return title
     }
 }

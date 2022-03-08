@@ -11,5 +11,7 @@ interface AppRepository {
 
     fun getAudiobooksWithInfo(): Flow<List<AudiobookWithInfo>>
 
-    suspend fun setPosition(bookUri: String, position: Long)
+    suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean = false)
+
+    suspend fun setChapterIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean)
 }

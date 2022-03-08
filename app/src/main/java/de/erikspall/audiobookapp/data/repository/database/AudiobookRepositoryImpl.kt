@@ -54,7 +54,9 @@ class AudiobookRepositoryImpl(
         audiobookDao.deleteAll()
     }
 
-    override suspend fun setPosition(bookUri: String, position: Long) {
-        audiobookDao.setPosition(bookUri, position)
+    override suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean) {
+        audiobookDao.setPosition(audiobookId, position, isPlaying)
     }
+
+
 }

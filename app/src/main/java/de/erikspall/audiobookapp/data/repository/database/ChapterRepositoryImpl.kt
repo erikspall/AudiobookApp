@@ -45,4 +45,12 @@ class ChapterRepositoryImpl(
     override suspend fun getChaptersOfAudiobook(audiobookId: Long): List<Chapter> {
         return chapterDao.getChaptersOfAudiobook(audiobookId)
     }
+
+    override suspend fun setIsPlaying(
+        audiobookId: Long,
+        chapterId: Long,
+        isPlaying: Boolean
+    ) {
+        chapterDao.setIsPlaying(audiobookId, chapterId, isPlaying)
+    }
 }

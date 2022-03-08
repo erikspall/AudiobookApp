@@ -41,12 +41,12 @@ interface AudiobookDao {
     @Query("SELECT * FROM audiobook WHERE uri = :uri")
     suspend fun getAudiobookWithInfoByUri(uri: String): AudiobookWithInfo?
 
-   @Query("SELECT EXISTS(SELECT * FROM audiobook WHERE uri = :uri COLLATE NOCASE)")
+    @Query("SELECT EXISTS(SELECT * FROM audiobook WHERE uri = :uri COLLATE NOCASE)")
     suspend fun audiobookExists(uri: String): Boolean
 
     @Query("DELETE FROM audiobook")
     suspend fun deleteAll()
 
-    @Query("UPDATE audiobook SET position = :position WHERE uri = :bookUri")
-    suspend fun setPosition(bookUri: String, position: Long)
+    @Query("UPDATE audiobook SET position = :position, isPlaying = :isPlaying WHERE audiobookId = :audiobookId")
+    suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean)
 }

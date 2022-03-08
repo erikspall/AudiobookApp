@@ -56,9 +56,18 @@ class AppRepositoryImpl(
         return allAudiobooksWithInfo
     }
 
-    override suspend fun setPosition(bookUri: String, position: Long) {
-        audiobookRepo.setPosition(bookUri, position)
+    override suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean) {
+        audiobookRepo.setPosition(audiobookId, position, isPlaying)
     }
+
+    override suspend fun setChapterIsPlaying(
+        audiobookId: Long,
+        chapterId: Long,
+        isPlaying: Boolean
+    ) {
+        chapterRepo.setIsPlaying(audiobookId, chapterId, isPlaying)
+    }
+
 
     private suspend fun getOrInsertPerson(person: String): Long {
         val firstName = person.substringBeforeLast(" ")

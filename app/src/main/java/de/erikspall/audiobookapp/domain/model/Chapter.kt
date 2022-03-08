@@ -22,5 +22,6 @@ data class Chapter (
     val start_time: String,
     val end: Double,
     val end_time: String,
-    val title: String
+    val title: String,
+    val isPlaying: Boolean = false
 )
