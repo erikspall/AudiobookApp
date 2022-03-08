@@ -10,6 +10,16 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MediaMetadata.*
 import com.google.common.collect.ImmutableList
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.AUTHOR_ID
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.BOOK_PREFIX
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.CHAPTER_PREFIX
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.LIBRARY_ID
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.METADATA_BOOK_ID
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.METADATA_CHAPTER_ID
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.METADATA_KEY_DURATION
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.NARRATOR_ID
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.PERSON_PREFIX
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.ROOT_ID
 import de.erikspall.audiobookapp.domain.model.AudiobookWithInfo
 import de.erikspall.audiobookapp.domain.model.Chapter
 import de.erikspall.audiobookapp.domain.model.Person
@@ -29,14 +39,7 @@ object MediaItemTree {
     private var bookTitleMap: MutableMap<String, MediaItemNode> = mutableMapOf()
 
     private var isInitialized = false
-    private const val ROOT_ID = "[rootID]"
-    private const val LIBRARY_ID = "[libraryID]"
-    private const val AUTHOR_ID = "[authorID]"
-    private const val NARRATOR_ID = "[narratorID]"
-    private const val PERSON_PREFIX = "[person]"
-    private const val BOOK_PREFIX = "[book]"
-    private const val CHAPTER_PREFIX = "[chapter]"
-    const val METADATA_KEY_DURATION = "1"
+
 
     private class MediaItemNode(val item: MediaItem) {
         private val children: MutableList<MediaItem> = ArrayList()
@@ -68,7 +71,7 @@ object MediaItemTree {
         coverUri: Uri? = null,
         startTime: Long? = null,
         endTime: Long? = null,
-        duration: Bundle? = null
+        extras: Bundle? = null
     ): MediaItem {
         val clippingConfiguration = MediaItem.ClippingConfiguration.Builder()
             .setStartPositionMs(startTime ?: 0)
@@ -84,7 +87,7 @@ object MediaItemTree {
             .setArtworkUri(coverUri)
             .setAlbumArtist(narrator)
             .setMediaUri(sourceUri)
-            .setExtras(duration)
+            .setExtras(extras)
             .build()
         return MediaItem.Builder()
             .setMediaId(mediaId)
@@ -211,10 +214,14 @@ object MediaItemTree {
         val id = book.audiobook.audiobookId
         val bookFolderIdInTree = BOOK_PREFIX + id
 
-        val duration: Bundle = Bundle()
-        duration.putLong(
+        val extras: Bundle = Bundle()
+        extras.putLong(
             METADATA_KEY_DURATION,
             book.audiobook.duration
+        )
+        extras.putLong(
+            METADATA_BOOK_ID,
+            book.audiobook.audiobookId
         )
 
         // Create Book in Tree
@@ -230,7 +237,7 @@ object MediaItemTree {
                         genre = (book.genres.getOrNull(0) ?: "No genre").toString(),
                         folderType = FOLDER_TYPE_PLAYLISTS,
                         coverUri = book.audiobook.coverUri.toUri(),
-                        duration = duration
+                        extras = extras
                     )
                 )
             // Add book to all needed folders
@@ -286,10 +293,18 @@ object MediaItemTree {
             val chapterIdInTree = bookFolderIdInTree + CHAPTER_PREFIX + id
             if (!treeNodes.containsKey(chapterIdInTree)) {
 
-                val duration: Bundle = Bundle()
-                duration.putLong(
+                val extras: Bundle = Bundle()
+                extras.putLong(
                     METADATA_KEY_DURATION,
                     ((chapter.end_time.toDouble() - chapter.start_time.toDouble()) * 1000).toLong()
+                )
+                extras.putLong(
+                    METADATA_BOOK_ID,
+                    chapter.audiobookId
+                )
+                extras.putLong(
+                    METADATA_CHAPTER_ID,
+                    chapter.chapterId
                 )
 
                 treeNodes[chapterIdInTree] =
@@ -307,7 +322,7 @@ object MediaItemTree {
                             folderType = FOLDER_TYPE_NONE,
                             startTime = (chapter.start_time.toDouble() * 1000).toLong(),
                             endTime = (chapter.end_time.toDouble() * 1000).toLong(),
-                            duration = duration
+                            extras = extras
                         )
                     )
                 treeNodes[bookFolderIdInTree]!!.addChild(chapterIdInTree)
