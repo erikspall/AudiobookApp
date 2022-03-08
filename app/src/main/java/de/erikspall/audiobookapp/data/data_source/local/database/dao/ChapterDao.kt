@@ -32,4 +32,14 @@ interface ChapterDao {
 
     @Query("UPDATE chapter SET isPlaying = :isPlaying WHERE audiobookId = :audiobookId AND chapterId = :chapterId")
     suspend fun setChapterIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean)
+
+    @Query("UPDATE chapter SET isPlaying = 0 WHERE isPlaying = 1 AND audiobookId = :audiobookId")
+    suspend fun resetChapterIsPlayingWhereNeeded(audiobookId: Long)
+
+    @Transaction
+    suspend fun resetBeforeSetChapterIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean){
+        resetChapterIsPlayingWhereNeeded(audiobookId)
+        setChapterIsPlaying(audiobookId, chapterId, isPlaying)
+    }
+
 }

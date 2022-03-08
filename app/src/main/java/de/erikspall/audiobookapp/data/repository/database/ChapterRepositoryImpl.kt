@@ -51,6 +51,6 @@ class ChapterRepositoryImpl(
         chapterId: Long,
         isPlaying: Boolean
     ) {
-        chapterDao.setChapterIsPlaying(audiobookId, chapterId, isPlaying)
+        chapterDao.resetBeforeSetChapterIsPlaying(audiobookId, chapterId, isPlaying)
     }
 }

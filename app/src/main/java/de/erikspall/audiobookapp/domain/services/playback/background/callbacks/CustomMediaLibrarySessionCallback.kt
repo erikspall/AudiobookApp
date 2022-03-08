@@ -139,6 +139,16 @@ class CustomMediaLibrarySessionCallback(
                     )
                 }
             }
+            Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM -> {
+                Log.d("PlayerCommand", "Next chapter")
+            }
+            Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM -> {
+                Log.d("PlayerCommand", "Previous chapter")
+            }
+            Player.COMMAND_SEEK_TO_PREVIOUS -> {
+                Log.d("PlayerCommand", "Seek to beginning or previous chapter")
+
+            }
             else -> {
                 Log.d("PlayerCommand", "Unknown: $playerCommand")
             }

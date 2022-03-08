@@ -20,6 +20,7 @@ import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaI
 import de.erikspall.audiobookapp.domain.const.PlaybackService.ACTION_QUIT
 import de.erikspall.audiobookapp.domain.services.playback.background.callbacks.CustomMediaLibrarySessionCallback
 import de.erikspall.audiobookapp.domain.services.playback.background.filler.CustomMediaItemFiller
+import de.erikspall.audiobookapp.domain.services.playback.background.listeners.PlayerListener
 import de.erikspall.audiobookapp.domain.use_case.audiobook.AudiobookUseCases
 import de.erikspall.audiobookapp.domain.use_case.playback.PlaybackUseCases
 import kotlinx.coroutines.MainScope
@@ -37,7 +38,17 @@ class PlayerService : MediaLibraryService() {
 
     private lateinit var player: ExoPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
-
+    private val playerListener = PlayerListener(
+        onMediaMetadataChangeEvent = {
+            MainScope().launch {
+                audiobookUseCases.set.chapterIsPlaying(
+                    playbackUseCases.getCurrent.bookId(),
+                    playbackUseCases.getCurrent.chapterId(),
+                    true
+                )
+            }
+        }
+    )
 
     companion object {
         const val SEARCH_QUERY_PREFIX_COMPAT = "androidx://media3-session/playFromSearch"
@@ -96,6 +107,8 @@ class PlayerService : MediaLibraryService() {
         player = ExoPlayer.Builder(this)
             .setAudioAttributes(AudioAttributes.DEFAULT, true)
             .build()
+
+        player.addListener(playerListener)
 
         playbackUseCases.initizialize.mediaItemTree(audiobookUseCases.getBooksWithInfo)
 

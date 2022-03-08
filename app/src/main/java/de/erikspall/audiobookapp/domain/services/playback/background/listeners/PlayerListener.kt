@@ -7,9 +7,9 @@ import androidx.media3.common.Player
 
 @SuppressLint("UnsafeOptInUsageError")
 class PlayerListener(
-    private val onPlayingChanged: (Boolean) -> Unit,
-    private val onMediaMetadataChangeEvent: (MediaMetadata) -> Unit,
-    private val onPlaybackState: (Int) -> Unit
+    private val onPlayingChanged: (Boolean) -> Unit = {},
+    private val onMediaMetadataChangeEvent: (MediaMetadata) -> Unit = {},
+    private val onPlaybackState: (Int) -> Unit = {}
 ): Player.Listener {
     private var lastMediaMetadata = MediaMetadata.EMPTY
 

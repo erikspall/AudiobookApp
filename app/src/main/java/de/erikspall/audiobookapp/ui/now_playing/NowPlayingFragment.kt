@@ -94,7 +94,14 @@ class NowPlayingFragment : Fragment() {
 
         viewModel.state.chapterSliderValue.observe(viewLifecycleOwner) { value ->
             // TODO: Check if value is in bounds
-            binding.chapterSlider.value = value
+            if (value >= 0.0f && value < binding.chapterSlider.valueTo)
+                binding.chapterSlider.value = value
+            else {
+                Log.d("NowPlayingFragment", "Chapter slider value out of bounds! value: $value to: ${binding.chapterSlider.valueTo}")
+                binding.chapterSlider.value = 0.0f
+            }
+
+
         }
 
         viewModel.state.position.observe(viewLifecycleOwner) { newPositions ->

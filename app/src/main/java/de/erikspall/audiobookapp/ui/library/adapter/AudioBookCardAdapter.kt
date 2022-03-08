@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -64,8 +65,6 @@ class AudioBookCardAdapter(
                 .into(book_image)
             val progressInPercent =
                 ((audiobookWithPersons.audiobook.position.toDouble() / audiobookWithPersons.audiobook.duration) * 100.0).roundToInt()
-            // Log.d("AudiobookAdapter", "$audiobookWithAuthor")
-            // Log.d("AudiobookAdapter", "Calculated progress: $progressInPercent")
             book_title.text = audiobookWithPersons.audiobook.title
             book_progress.text = context.resources?.getString(
                 R.string.progress_text_view,
@@ -73,8 +72,10 @@ class AudioBookCardAdapter(
             )
             book_progress_indicator.setProgress(progressInPercent, false)
 
-            //if (currentlyPlayingBookId == audiobookWithPersons.audiobook.audiobookId)
-            //    playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause))
+            if (audiobookWithPersons.audiobook.isPlaying)
+                playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause))
+            else
+                playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play))
 
             playButton.setOnClickListener {
                 onItemClicked(audiobookWithPersons.audiobook)
@@ -187,7 +188,8 @@ class AudioBookCardAdapter(
                 return oldItem.audiobook.coverUri == newItem.audiobook.coverUri &&
                         oldItem.audiobook.position == newItem.audiobook.position &&
                         oldItem.audiobook.title == newItem.audiobook.title &&
-                        oldItem.audiobook.authorId == newItem.audiobook.authorId
+                        oldItem.audiobook.authorId == newItem.audiobook.authorId &&
+                        oldItem.audiobook.isPlaying == newItem.audiobook.isPlaying
             }
 
             override fun getChangePayload(
