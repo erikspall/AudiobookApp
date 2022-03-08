@@ -18,6 +18,7 @@ import de.erikspall.audiobookapp.domain.model.Chapter
 import de.erikspall.audiobookapp.domain.util.Conversion
 
 class ChapterItemAdapter(
+    private val onItemClicked: (Int) -> Unit
 ): ListAdapter<Chapter, ChapterItemAdapter.ViewHolder>(
     CHAPTER_COMPARATOR
 ) {
@@ -28,11 +29,18 @@ class ChapterItemAdapter(
      */
     class ViewHolder(
         view: View,
-        private val context: Context
+        private val context: Context,
+        private val clickAtPosition: (Int) -> Unit
     ) : RecyclerView.ViewHolder(view) {
         private val isPlayingImageView: ImageView = view.findViewById(R.id.image_view_is_playing)
         private val chapterTitleTextView: TextView = view.findViewById(R.id.chapter_title_text_view)
         private val chapterDurationTextView: TextView = view.findViewById(R.id.chapter_duration_text_view)
+
+        init {
+            itemView.setOnClickListener {
+                clickAtPosition(absoluteAdapterPosition)
+            }
+        }
 
         @SuppressLint("UnsafeOptInUsageError")
         fun bind(chapter: Chapter) {
@@ -51,7 +59,9 @@ class ChapterItemAdapter(
         val view = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.chapter_list_item, viewGroup, false)
 
-        return ViewHolder(view, viewGroup.context)
+        return ViewHolder(view, viewGroup.context) { chapterIndex ->
+            onItemClicked(chapterIndex)
+        }
     }
 
     // Replace the contents of a view (invoked by the layout manager)

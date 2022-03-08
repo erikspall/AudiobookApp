@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,7 +40,9 @@ class ChaptersSheet : BottomSheetDialogFragment() {
         _binding = ModalBottomSheetChaptersBinding.inflate(inflater, container, false)
 
         binding.chapterRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val adapter = ChapterItemAdapter()
+        val adapter = ChapterItemAdapter() { chapterIndex ->
+            playbackUseCases.seekTo.chapter(chapterIndex)
+        }
         binding.chapterRecyclerView.adapter = adapter
 
         if (!viewModel.chapters.hasActiveObservers())
@@ -48,6 +51,7 @@ class ChaptersSheet : BottomSheetDialogFragment() {
                     adapter.submitList(chapters)
                 }
             }
+
 
         return binding.root
     }
