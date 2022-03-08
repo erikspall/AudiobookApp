@@ -29,4 +29,6 @@ interface AudiobookRepository {
     suspend fun deleteAll()
 
     suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean = false)
+
+    suspend fun setBookIsPlaying(audiobookId: Long, isPlaying: Boolean = false)
 }

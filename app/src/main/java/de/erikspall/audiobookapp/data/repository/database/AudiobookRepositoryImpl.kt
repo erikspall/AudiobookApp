@@ -58,5 +58,9 @@ class AudiobookRepositoryImpl(
         audiobookDao.setPosition(audiobookId, position, isPlaying)
     }
 
+    override suspend fun setBookIsPlaying(audiobookId: Long, isPlaying: Boolean) {
+        audiobookDao.setBookIsPlaying(audiobookId, isPlaying)
+    }
+
 
 }

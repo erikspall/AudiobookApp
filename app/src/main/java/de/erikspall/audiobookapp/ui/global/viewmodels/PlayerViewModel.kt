@@ -144,7 +144,7 @@ class PlayerViewModel @Inject constructor(
     private fun savePosition(uri: String, position: Long) {
         if (uri.isNotEmpty())
             viewModelScope.launch { // TODO: Should probably save in service
-                bookUseCases.savePosition(
+                bookUseCases.set(
                     uri,
                     position
                 )

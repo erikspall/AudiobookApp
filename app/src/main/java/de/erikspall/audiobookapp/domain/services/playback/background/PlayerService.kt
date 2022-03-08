@@ -65,7 +65,7 @@ class PlayerService : MediaLibraryService() {
             when (intent.action) {
                 ACTION_QUIT -> {
                     MainScope().launch {
-                        audiobookUseCases.savePosition(
+                        audiobookUseCases.set(
                             (playbackUseCases.getCurrent.mediaMetaData().mediaUri
                                 ?: Uri.EMPTY).toString(),
                             playbackUseCases.getCurrent.positionInBook(player)

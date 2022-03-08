@@ -105,7 +105,7 @@ class CustomMediaLibrarySessionCallback(
                     // Pause is requested -> Save progress
                     val book = (session.player.currentMediaItem?.mediaMetadata?.mediaUri ?: Uri.EMPTY).toString()
                     MainScope().launch {
-                        audiobookUseCases.savePosition(
+                        audiobookUseCases.set(
                             book,
                             playbackUseCases.getCurrent.positionInBook(session.player)
                         )
@@ -118,7 +118,7 @@ class CustomMediaLibrarySessionCallback(
                 Log.d("PlayerCommand", "Stop requested")
                 val book = (session.player.currentMediaItem?.mediaMetadata?.mediaUri ?: Uri.EMPTY).toString()
                 MainScope().launch {
-                    audiobookUseCases.savePosition(
+                    audiobookUseCases.set(
                         book,
                         playbackUseCases.getCurrent.positionInBook(session.player)
                     )

@@ -65,7 +65,11 @@ class AppRepositoryImpl(
         chapterId: Long,
         isPlaying: Boolean
     ) {
-        chapterRepo.setIsPlaying(audiobookId, chapterId, isPlaying)
+        chapterRepo.setChapterIsPlaying(audiobookId, chapterId, isPlaying)
+    }
+
+    override suspend fun setBookIsPlaying(audiobookId: Long, isPlaying: Boolean) {
+        audiobookRepo.setBookIsPlaying(audiobookId, isPlaying)
     }
 
 

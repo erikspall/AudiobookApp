@@ -21,5 +21,5 @@ interface ChapterRepository {
 
     suspend fun getChaptersOfAudiobook(audiobookId: Long): List<Chapter>
 
-    suspend fun setIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean = false)
+    suspend fun setChapterIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean = false)
 }

@@ -14,4 +14,6 @@ interface AppRepository {
     suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean = false)
 
     suspend fun setChapterIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean)
+
+    suspend fun setBookIsPlaying(audiobookId: Long, isPlaying: Boolean)
 }

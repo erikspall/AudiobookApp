@@ -23,7 +23,7 @@ object UseCaseModule {
             getBooksWithPersons = GetBooksWithPersons(repository),
             importBooksLocal = ImportBooksLocal(repository),
             getBooksWithInfo = GetBooksWithInfo(repository),
-            savePosition = SavePosition(repository)
+            set = Set(repository)
         )
     }
 

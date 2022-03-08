@@ -31,5 +31,5 @@ interface ChapterDao {
     suspend fun getChaptersOfAudiobook(audiobookId: Long): List<Chapter>
 
     @Query("UPDATE chapter SET isPlaying = :isPlaying WHERE audiobookId = :audiobookId AND chapterId = :chapterId")
-    suspend fun setIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean)
+    suspend fun setChapterIsPlaying(audiobookId: Long, chapterId: Long, isPlaying: Boolean)
 }

@@ -49,4 +49,7 @@ interface AudiobookDao {
 
     @Query("UPDATE audiobook SET position = :position, isPlaying = :isPlaying WHERE audiobookId = :audiobookId")
     suspend fun setPosition(audiobookId: Long, position: Long, isPlaying: Boolean)
+
+    @Query("UPDATE audiobook SET isPlaying = :isPlaying WHERE audiobookId = :audiobookId")
+    suspend fun setBookIsPlaying(audiobookId: Long, isPlaying: Boolean)
 }
