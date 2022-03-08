@@ -7,8 +7,8 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
 import de.erikspall.audiobookapp.data.data_source.local.player_controller.ControllerDataSource
 import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTree
-import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTree.METADATA_KEY_DURATION
 import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTreeDataSource
+import de.erikspall.audiobookapp.domain.const.MediaTreeConst.METADATA_KEY_DURATION
 import de.erikspall.audiobookapp.domain.model.AudiobookWithInfo
 import de.erikspall.audiobookapp.domain.repository.PlayerControllerRepository
 import de.erikspall.audiobookapp.domain.use_case.audiobook.GetBooksWithInfo
@@ -113,7 +113,7 @@ class PlayerControllerRepositoryImpl (
         getController()?.seekTo(position)
     }
 
-    override fun getCurrentBookDuration(): Long {
+    override fun getCurrentBookDuration(): Long { //TODO : make that more efficient
         val rawId =  getCurrentMediaItem().mediaId
         val index = rawId.indexOf("[", 1)
         return if (index != -1){

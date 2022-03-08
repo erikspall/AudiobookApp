@@ -103,24 +103,39 @@ class CustomMediaLibrarySessionCallback(
                 if (session.player.isPlaying) {
                     Log.d("PlayerCommand", "Pause requested")
                     // Pause is requested -> Save progress
-                    val book = (session.player.currentMediaItem?.mediaMetadata?.mediaUri ?: Uri.EMPTY).toString()
+                    val bookId = playbackUseCases.getCurrent.bookId()
+                    val chapterId = playbackUseCases.getCurrent.chapterId()
+                    val pos = playbackUseCases.getCurrent.positionInBook(session.player)
                     MainScope().launch {
-                        audiobookUseCases.set(
-                            book,
-                            playbackUseCases.getCurrent.positionInBook(session.player)
+                        audiobookUseCases.set.position(
+                            bookId,
+                            chapterId,
+                            pos,
+                            false
                         )
                     }
                 } else {
                     Log.d("PlayerCommand", "Play requested")
+                    MainScope().launch {
+                        audiobookUseCases.set.bothArePlaying(
+                            playbackUseCases.getCurrent.bookId(),
+                            playbackUseCases.getCurrent.chapterId(),
+                            true
+                        )
+                    }
                 }
             }
             Player.COMMAND_STOP -> {
                 Log.d("PlayerCommand", "Stop requested")
-                val book = (session.player.currentMediaItem?.mediaMetadata?.mediaUri ?: Uri.EMPTY).toString()
+                val bookId = playbackUseCases.getCurrent.bookId()
+                val chapterId = playbackUseCases.getCurrent.chapterId()
+                val pos = playbackUseCases.getCurrent.positionInBook(session.player)
                 MainScope().launch {
-                    audiobookUseCases.set(
-                        book,
-                        playbackUseCases.getCurrent.positionInBook(session.player)
+                    audiobookUseCases.set.position(
+                        bookId,
+                        chapterId,
+                        pos,
+                        false
                     )
                 }
             }

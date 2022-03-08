@@ -111,11 +111,15 @@ class PlayerViewModel @Inject constructor(
             }
             is PlayerEvent.StartPlayback -> {
                 // Save position of current Book before switching to new book
-                val currentMediaMetadata = playbackUseCases.getCurrent.mediaMetaData()
-                if (currentMediaMetadata != MediaMetadata.EMPTY)
+                val bookId = playbackUseCases.getCurrent.bookId()
+                val chapterId = playbackUseCases.getCurrent.chapterId()
+                val position = playbackUseCases.getCurrent.positionInBook()
+
                     savePosition(
-                        currentMediaMetadata.mediaUri.toString(),
-                        playbackUseCases.getCurrent.positionInBook()
+                        bookId,
+                        chapterId,
+                        position,
+                        /* isPlaying */ false
                     )
 
                 playbackUseCases.playBook(event.audiobook)
@@ -141,12 +145,13 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    private fun savePosition(uri: String, position: Long) {
-        if (uri.isNotEmpty())
+    private fun savePosition(bookId: Long, chapterId: Long, position: Long, isPlaying: Boolean) {
             viewModelScope.launch { // TODO: Should probably save in service
-                bookUseCases.set(
-                    uri,
-                    position
+                bookUseCases.set.position(
+                    bookId,
+                    chapterId,
+                    position,
+                    isPlaying
                 )
             }
     }
@@ -163,8 +168,10 @@ class PlayerViewModel @Inject constructor(
     private fun keepBookProgressUpdated() {
         handler.postDelayed({
             savePosition(
-                playbackUseCases.getCurrent.mediaMetaData().mediaUri.toString(),
-                playbackUseCases.getCurrent.positionInBook()
+                playbackUseCases.getCurrent.bookId(),
+                playbackUseCases.getCurrent.chapterId(),
+                playbackUseCases.getCurrent.positionInBook(),
+                playbackUseCases.state.isPlaying()
             )
             keepBookProgressUpdated()
         }, 60000) //Every minute

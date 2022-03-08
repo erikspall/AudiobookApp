@@ -64,13 +64,6 @@ class PlayerService : MediaLibraryService() {
         if (intent != null && intent.action != null) {
             when (intent.action) {
                 ACTION_QUIT -> {
-                    MainScope().launch {
-                        audiobookUseCases.set(
-                            (playbackUseCases.getCurrent.mediaMetaData().mediaUri
-                                ?: Uri.EMPTY).toString(),
-                            playbackUseCases.getCurrent.positionInBook(player)
-                        )
-                    }
                     val fadeOut = ValueAnimator.ofFloat(1f, 0f)
                     fadeOut.duration = 10000
                     fadeOut.addUpdateListener {
@@ -78,6 +71,16 @@ class PlayerService : MediaLibraryService() {
                     }
                     fadeOut.doOnEnd {
                         player.pause()
+
+                        MainScope().launch {
+                            audiobookUseCases.set.position(
+                                playbackUseCases.getCurrent.bookId(),
+                                playbackUseCases.getCurrent.chapterId(),
+                                playbackUseCases.getCurrent.positionInBook(player),
+                                false
+                            )
+                        }
+
                         player.volume = 1f
                         stopSelf()
                     }
