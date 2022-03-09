@@ -35,7 +35,6 @@ class ControllerDataSource(
             sessionToken
         ).buildAsync()
 
-
         controllerFuture!!.addListener(
             {
                 onControllerCreated()
