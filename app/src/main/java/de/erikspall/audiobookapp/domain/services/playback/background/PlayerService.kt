@@ -42,8 +42,8 @@ class PlayerService : MediaLibraryService() {
         onMediaMetadataChangeEvent = {
             MainScope().launch {
                 audiobookUseCases.set.chapterIsPlaying(
-                    playbackUseCases.getCurrent.bookId(),
-                    playbackUseCases.getCurrent.chapterId(),
+                    playbackUseCases.getCurrent.bookId(player),
+                    playbackUseCases.getCurrent.chapterId(player),
                     true
                 )
             }
@@ -85,8 +85,8 @@ class PlayerService : MediaLibraryService() {
 
                         MainScope().launch {
                             audiobookUseCases.set.position(
-                                playbackUseCases.getCurrent.bookId(),
-                                playbackUseCases.getCurrent.chapterId(),
+                                playbackUseCases.getCurrent.bookId(player),
+                                playbackUseCases.getCurrent.chapterId(player),
                                 playbackUseCases.getCurrent.positionInBook(player),
                                 false
                             )

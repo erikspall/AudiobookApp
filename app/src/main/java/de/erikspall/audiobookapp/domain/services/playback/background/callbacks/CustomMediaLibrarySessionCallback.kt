@@ -103,8 +103,8 @@ class CustomMediaLibrarySessionCallback(
                 if (session.player.isPlaying) {
                     Log.d("PlayerCommand", "Pause requested")
                     // Pause is requested -> Save progress
-                    val bookId = playbackUseCases.getCurrent.bookId() //TODO: Does not work, when controller dead?
-                    val chapterId = playbackUseCases.getCurrent.chapterId()
+                    val bookId = playbackUseCases.getCurrent.bookId(session.player) //TODO: Does not work, when controller dead?
+                    val chapterId = playbackUseCases.getCurrent.chapterId(session.player)
                     val pos = playbackUseCases.getCurrent.positionInBook(session.player)
                     MainScope().launch {
                         audiobookUseCases.set.position(
@@ -118,8 +118,8 @@ class CustomMediaLibrarySessionCallback(
                     Log.d("PlayerCommand", "Play requested")
                     MainScope().launch {
                         audiobookUseCases.set.bothArePlaying(
-                            playbackUseCases.getCurrent.bookId(),
-                            playbackUseCases.getCurrent.chapterId(),
+                            playbackUseCases.getCurrent.bookId(session.player),
+                            playbackUseCases.getCurrent.chapterId(session.player),
                             true
                         )
                     }
@@ -127,8 +127,8 @@ class CustomMediaLibrarySessionCallback(
             }
             Player.COMMAND_STOP -> {
                 Log.d("PlayerCommand", "Stop requested")
-                val bookId = playbackUseCases.getCurrent.bookId()
-                val chapterId = playbackUseCases.getCurrent.chapterId()
+                val bookId = playbackUseCases.getCurrent.bookId(session.player)
+                val chapterId = playbackUseCases.getCurrent.chapterId(session.player)
                 val pos = playbackUseCases.getCurrent.positionInBook(session.player)
                 MainScope().launch {
                     audiobookUseCases.set.position(

@@ -91,4 +91,12 @@ class GetCurrent(
     fun chapterId(): Long {
         return repository.getCurrentMediaMetadata().extras?.getLong(METADATA_CHAPTER_ID) ?: -1
     }
+
+    fun bookId(player: Player): Long {
+        return player.currentMediaItem?.mediaMetadata?.extras?.getLong(METADATA_BOOK_ID) ?: -1
+    }
+
+    fun chapterId(player: Player): Long {
+        return player.currentMediaItem?.mediaMetadata?.extras?.getLong(METADATA_CHAPTER_ID) ?: -1
+    }
 }
