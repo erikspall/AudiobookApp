@@ -60,6 +60,8 @@ class SleepTimerSheet() : BottomSheetDialogFragment() {
                 newMinute -= 60
                 hour += 1
             }
+            if (hour >= 24)
+                hour -= 24
             binding.stopInfoText.text = requireContext().getString(
                 R.string.playback_stop_info_at,
                 Conversion.formatTimeToString(

@@ -109,7 +109,7 @@ class LibraryFragment : Fragment() {
                         "Buffering -> do nothing"
                     )
 
-                    //showBufferingInMiniPlayer()
+                    showBufferingInMiniPlayer()
                 }
                 Player.STATE_READY -> {
                     Log.d("PlaybackStateLib", "Ready -> Begin observing metadata")
@@ -141,25 +141,28 @@ class LibraryFragment : Fragment() {
 
 
         playerViewModel.state.sliderProgress.observe(viewLifecycleOwner) { progress ->
-            binding.miniPlayer.currentBookProgress.setProgress(progress, true)
+            if (!binding.miniPlayer.currentBookProgress.isIndeterminate)
+                binding.miniPlayer.currentBookProgress.setProgress(progress, true)
         }
     }
 
     private fun showBufferingInMiniPlayer() {
+        binding.miniPlayer.container.visibility = View.VISIBLE
+        binding.miniPlayerBackground.visibility = View.VISIBLE
+        binding.miniPlayer.playButton.visibility = View.INVISIBLE
+        binding.miniPlayer.castButton.visibility = View.INVISIBLE
         binding.miniPlayer.currentBookProgress.isIndeterminate = true
-        Glide.with(requireContext())
-            .load(R.drawable.ic_image)
-            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-            .placeholder(R.drawable.ic_image)
-            .into(binding.miniPlayer.currentBookImage)
+        binding.miniPlayer.currentBookImage.setImageDrawable(null)
         binding.miniPlayer.currentBookTitle.text = ""
-        binding.miniPlayer.currentBookChapter.text = "Loading ..."
+        binding.miniPlayer.currentBookChapter.text = ""
     }
 
     @SuppressLint("UnsafeOptInUsageError")
     private fun loadIntoMiniPlayer(metaData: MediaMetadata) {
         binding.miniPlayer.container.visibility = View.VISIBLE
         binding.miniPlayerBackground.visibility = View.VISIBLE
+        binding.miniPlayer.playButton.visibility = View.VISIBLE
+        binding.miniPlayer.castButton.visibility = View.VISIBLE
         binding.miniPlayer.currentBookProgress.isIndeterminate = false
         //binding.miniPlayer.currentBookProgress.setProgress(playerViewModel.progressBig(), false)
         Log.d("Library", "Loading metadata: ${metaData.title}")
