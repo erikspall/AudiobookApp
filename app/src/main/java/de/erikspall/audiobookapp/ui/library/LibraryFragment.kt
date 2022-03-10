@@ -194,11 +194,13 @@ class LibraryFragment : Fragment() {
         )
 
         binding.libraryRecyclerView.adapter = adapter
-        if (!viewModel.books.hasActiveObservers())
-            viewModel.books.observe(viewLifecycleOwner) { books ->
-                books.let { adapter.submitList(it) }
-                Log.d("LiveData", "NewBooks/Information received!")
-            }
+        if (viewModel.books.hasActiveObservers())
+            viewModel.books.removeObservers(viewLifecycleOwner)
+
+        viewModel.books.observe(viewLifecycleOwner) { books ->
+            books.let { adapter.submitList(it) }
+            Log.d("LiveData", "NewBooks/Information received!")
+        }
     }
 
     override fun onResume() {
