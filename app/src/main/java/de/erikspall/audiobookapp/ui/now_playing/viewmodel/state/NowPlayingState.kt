@@ -11,6 +11,7 @@ data class NowPlayingState (
     val chapterSliderValue: MutableLiveData<Long> = MutableLiveData(0),
     val bookProgressValue: MutableLiveData<Int> = MutableLiveData(0),
     var sliderIsBeingDragged: Boolean = false,
+    val isSleepTimerSet: MutableLiveData<Boolean> = MutableLiveData(false)
 )
 
 data class StaticInfo(

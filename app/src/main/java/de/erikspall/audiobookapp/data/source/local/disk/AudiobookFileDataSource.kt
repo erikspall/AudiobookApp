@@ -1,7 +1,7 @@
-package de.erikspall.audiobookapp.data.data_source.local.disk
+package de.erikspall.audiobookapp.data.source.local.disk
 
 import android.content.Context
-import de.erikspall.audiobookapp.data.data_source.local.disk.import.M4bImporter
+import de.erikspall.audiobookapp.data.source.local.disk.import.M4bImporter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

@@ -10,6 +10,8 @@
     <string name="progress_text_view_simple">%s%%</string>
     <string name="search_hint">Search library</string>
     <string name="duration">%s</string>
+    <string name="sleep_timer_shared_pref_name">SleepTimer</string>
+    <string name="sleep_timer_is_set_shared_pref_key">sleepTimerIsSet</string>
     <!-- Input Dialog -->
     <string name="input_title">Search</string>
     <string name="input_message">Search for title, author, genre, ...</string>

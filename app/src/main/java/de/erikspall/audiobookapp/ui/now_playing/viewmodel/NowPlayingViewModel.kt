@@ -65,6 +65,12 @@ class NowPlayingViewModel @Inject constructor(
                 updateMetadata()
                 resumeAllUpdates(onlyOnce = true)
             }
+            is NowPlayingEvent.SleepTimerSet -> {
+                state.isSleepTimerSet.value = true
+            }
+            is NowPlayingEvent.SleepTimerCanceled -> {
+                state.isSleepTimerSet.value = false
+            }
         }
     }
 

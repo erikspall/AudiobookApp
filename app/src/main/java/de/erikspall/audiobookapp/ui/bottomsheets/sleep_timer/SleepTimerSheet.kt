@@ -1,5 +1,7 @@
 package de.erikspall.audiobookapp.ui.bottomsheets.sleep_timer
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Resources
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -9,8 +11,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.TimePicker
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import de.erikspall.audiobookapp.MainActivity
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.ModalBottomSheetSleepTimerBinding
 import de.erikspall.audiobookapp.domain.use_case.playback.PlaybackUseCases
@@ -25,6 +30,9 @@ class SleepTimerSheet() : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var playbackUseCases: PlaybackUseCases
+
+    @Inject
+    lateinit var sleepTimerSharedPref: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,7 +60,8 @@ class SleepTimerSheet() : BottomSheetDialogFragment() {
         binding.cancelButton.setOnClickListener {
             this.dismiss()
         }
-        binding.picker.setOnTimeChangedListener { view, hourOfDay, minute ->
+
+        binding.picker.setOnTimeChangedListener { _, hourOfDay, minute ->
             val calendar: Calendar = Calendar.getInstance()
             var newMinute = minute*5 + calendar.get(Calendar.MINUTE)
             var hour = hourOfDay + calendar.get(Calendar.HOUR_OF_DAY)
@@ -73,7 +82,7 @@ class SleepTimerSheet() : BottomSheetDialogFragment() {
         }
         binding.setButton.setOnClickListener {
             if (binding.picker.hour == 0 && binding.picker.minute == 0) {
-                Log.d("SleepTimer", "Cannot set sleept timer for 0 minutes setting for 30s instead")
+                Log.d("SleepTimer", "Cannot set sleep timer for 0 minutes setting for 30s instead")
                 playbackUseCases.sleepTimer.set(
                     5000L
                 )
@@ -81,6 +90,14 @@ class SleepTimerSheet() : BottomSheetDialogFragment() {
                 playbackUseCases.sleepTimer.set(
                     ((binding.picker.hour * 60L) + binding.picker.minute*5) * 60L * 1000L
                 )
+           // setFragmentResult("isSleepTimerSet", bundleOf("sleepTimerSet" to true)) //TODO: Delete if SharedPreference is working
+
+            with (sleepTimerSharedPref.edit()) {
+                Log.d("SharedPreferences", "Setting sleepTimerIsSet to true")
+                putBoolean(getString(R.string.sleep_timer_is_set_shared_pref_key), true)
+                commit()
+            }
+
             this.dismiss()
         }
     }

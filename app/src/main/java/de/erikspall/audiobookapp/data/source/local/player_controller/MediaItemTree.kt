@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.data.data_source.local.player_controller
+package de.erikspall.audiobookapp.data.source.local.player_controller
 
 import android.annotation.SuppressLint
 import android.net.Uri

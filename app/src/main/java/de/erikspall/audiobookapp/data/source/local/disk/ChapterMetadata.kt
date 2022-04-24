@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.data.data_source.local.disk
+package de.erikspall.audiobookapp.data.source.local.disk
 
 data class ChapterMetadata (
     val time_base: String,

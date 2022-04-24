@@ -14,7 +14,7 @@ import androidx.media3.session.SessionResult
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTree
+import de.erikspall.audiobookapp.data.source.local.player_controller.MediaItemTree
 import de.erikspall.audiobookapp.domain.services.playback.background.PlayerService.Companion.SEARCH_QUERY_PREFIX
 import de.erikspall.audiobookapp.domain.services.playback.background.PlayerService.Companion.SEARCH_QUERY_PREFIX_COMPAT
 import de.erikspall.audiobookapp.domain.use_case.audiobook.AudiobookUseCases

@@ -1,6 +1,6 @@
 package de.erikspall.audiobookapp.data.repository.database
 
-import de.erikspall.audiobookapp.data.data_source.local.database.dao.GenreDao
+import de.erikspall.audiobookapp.data.source.local.database.dao.GenreDao
 import de.erikspall.audiobookapp.domain.model.Genre
 import de.erikspall.audiobookapp.domain.repository.GenreRepository
 import kotlinx.coroutines.flow.Flow

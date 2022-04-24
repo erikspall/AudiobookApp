@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.data.data_source.local.database.dao
+package de.erikspall.audiobookapp.data.source.local.database.dao
 
 import androidx.room.*
 import de.erikspall.audiobookapp.domain.model.AuthorWithAudiobooks

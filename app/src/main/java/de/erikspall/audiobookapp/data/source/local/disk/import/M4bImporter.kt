@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.data.data_source.local.disk.import
+package de.erikspall.audiobookapp.data.source.local.disk.import
 
 import android.content.ContentUris
 import android.content.Context
@@ -8,7 +8,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.net.toUri
-import de.erikspall.audiobookapp.data.data_source.local.disk.AudiobookMetadata
+import de.erikspall.audiobookapp.data.source.local.disk.AudiobookMetadata
 import de.erikspall.audiobookapp.domain.provider.AUTHORITY
 import java.io.File
 

@@ -1,11 +1,11 @@
-package de.erikspall.audiobookapp.data.data_source.local.disk.import
+package de.erikspall.audiobookapp.data.source.local.disk.import
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.FFprobeKit
-import de.erikspall.audiobookapp.data.data_source.local.disk.ChapterMetadata
+import de.erikspall.audiobookapp.data.source.local.disk.ChapterMetadata
 import org.json.JSONArray
 import org.json.JSONObject
 

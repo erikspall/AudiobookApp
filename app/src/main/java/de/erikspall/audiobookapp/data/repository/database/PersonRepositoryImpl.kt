@@ -1,6 +1,6 @@
 package de.erikspall.audiobookapp.data.repository.database
 
-import de.erikspall.audiobookapp.data.data_source.local.database.dao.PersonDao
+import de.erikspall.audiobookapp.data.source.local.database.dao.PersonDao
 import de.erikspall.audiobookapp.domain.model.AuthorWithAudiobooks
 import de.erikspall.audiobookapp.domain.model.Person
 import de.erikspall.audiobookapp.domain.model.ReaderWithAudiobooks

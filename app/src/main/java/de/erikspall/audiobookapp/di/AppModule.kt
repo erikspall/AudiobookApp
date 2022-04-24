@@ -2,15 +2,17 @@ package de.erikspall.audiobookapp.di
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import de.erikspall.audiobookapp.data.data_source.local.database.AudiobookDatabase
-import de.erikspall.audiobookapp.data.data_source.local.disk.AudiobookFileDataSource
-import de.erikspall.audiobookapp.data.data_source.local.player_controller.ControllerDataSource
-import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTreeDataSource
+import de.erikspall.audiobookapp.R
+import de.erikspall.audiobookapp.data.source.local.database.AudiobookDatabase
+import de.erikspall.audiobookapp.data.source.local.disk.AudiobookFileDataSource
+import de.erikspall.audiobookapp.data.source.local.player_controller.ControllerDataSource
+import de.erikspall.audiobookapp.data.source.local.player_controller.MediaItemTreeDataSource
 import de.erikspall.audiobookapp.data.repository.AppRepositoryImpl
 import de.erikspall.audiobookapp.data.repository.database.*
 import de.erikspall.audiobookapp.data.repository.player_controller.PlayerControllerRepositoryImpl
@@ -111,5 +113,13 @@ object AppModule {
             personRepo,
             audiobookFileDataSource
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSleepTimerSharedPref(
+        @ApplicationContext appContext: Context
+    ) : SharedPreferences {
+        return appContext.getSharedPreferences(appContext.getString(R.string.sleep_timer_shared_pref_name),Context.MODE_PRIVATE)
     }
 }

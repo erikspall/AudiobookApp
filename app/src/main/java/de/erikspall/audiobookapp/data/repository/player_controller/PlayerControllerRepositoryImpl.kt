@@ -5,9 +5,9 @@ import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
-import de.erikspall.audiobookapp.data.data_source.local.player_controller.ControllerDataSource
-import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTree
-import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTreeDataSource
+import de.erikspall.audiobookapp.data.source.local.player_controller.ControllerDataSource
+import de.erikspall.audiobookapp.data.source.local.player_controller.MediaItemTree
+import de.erikspall.audiobookapp.data.source.local.player_controller.MediaItemTreeDataSource
 import de.erikspall.audiobookapp.domain.const.MediaTreeConst.METADATA_KEY_DURATION
 import de.erikspall.audiobookapp.domain.model.AudiobookWithInfo
 import de.erikspall.audiobookapp.domain.repository.PlayerControllerRepository

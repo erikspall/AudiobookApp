@@ -3,7 +3,7 @@ package de.erikspall.audiobookapp.domain.services.playback.background.filler
 import android.annotation.SuppressLint
 import androidx.media3.common.MediaItem
 import androidx.media3.session.MediaSession
-import de.erikspall.audiobookapp.data.data_source.local.player_controller.MediaItemTree
+import de.erikspall.audiobookapp.data.source.local.player_controller.MediaItemTree
 
 class CustomMediaItemFiller : MediaSession.MediaItemFiller {
     @SuppressLint("UnsafeOptInUsageError")

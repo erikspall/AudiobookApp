@@ -10,8 +10,8 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.core.net.toUri
-import de.erikspall.audiobookapp.data.data_source.local.database.AudiobookDatabase
-import de.erikspall.audiobookapp.data.data_source.local.database.dao.AudiobookDao
+import de.erikspall.audiobookapp.data.source.local.database.AudiobookDatabase
+import de.erikspall.audiobookapp.data.source.local.database.dao.AudiobookDao
 import java.io.File
 import java.io.FileNotFoundException
 

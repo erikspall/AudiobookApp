@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.data.data_source.local.disk
+package de.erikspall.audiobookapp.data.source.local.disk
 
 import android.net.Uri
 

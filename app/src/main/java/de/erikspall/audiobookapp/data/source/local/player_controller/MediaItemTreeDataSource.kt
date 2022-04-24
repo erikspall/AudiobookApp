@@ -1,4 +1,4 @@
-package de.erikspall.audiobookapp.data.data_source.local.player_controller
+package de.erikspall.audiobookapp.data.source.local.player_controller
 
 import de.erikspall.audiobookapp.domain.model.AudiobookWithInfo
 import de.erikspall.audiobookapp.domain.use_case.audiobook.GetBooksWithInfo

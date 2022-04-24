@@ -1,11 +1,11 @@
-package de.erikspall.audiobookapp.data.data_source.local.database
+package de.erikspall.audiobookapp.data.source.local.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import de.erikspall.audiobookapp.data.data_source.local.database.dao.*
+import de.erikspall.audiobookapp.data.source.local.database.dao.*
 import de.erikspall.audiobookapp.domain.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
