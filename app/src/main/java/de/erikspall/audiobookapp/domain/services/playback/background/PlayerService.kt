@@ -99,10 +99,7 @@ class PlayerService : MediaLibraryService() {
 
                         player.volume = 1f
 
-                        with (sharedPref.edit()) {
-                            putBoolean(getString(R.string.sleep_timer_is_set_shared_pref_key), false)
-                            commit()
-                        }
+                        playbackUseCases.sleepTimer.onEnd()
 
                         stopSelf()
                     }

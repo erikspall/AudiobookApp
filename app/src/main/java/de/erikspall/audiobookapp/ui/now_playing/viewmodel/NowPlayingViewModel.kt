@@ -1,10 +1,12 @@
 package de.erikspall.audiobookapp.ui.now_playing.viewmodel
 
+import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.domain.const.Player.SEEK_INCREMENT
 import de.erikspall.audiobookapp.domain.use_case.audiobook.AudiobookUseCases
 import de.erikspall.audiobookapp.domain.use_case.playback.PlaybackUseCases
@@ -23,12 +25,34 @@ class NowPlayingViewModel @Inject constructor(
     private val handler = Handler(Looper.getMainLooper())
     private var isUpdating = false
 
+    init {
+        //state.isSleepTimerSet.value = playbackUseCases.sleepTimer.isScheduled()
+    }
+
     fun onEvent(event: NowPlayingEvent) {
         when (event) {
             is NowPlayingEvent.WentToForeground -> {
+
+                if (playbackUseCases.sleepTimer.isScheduled())
+                    onEvent(NowPlayingEvent.SleepTimerSet)
+                // Else not needed, because default value is false
+
+                playbackUseCases.sleepTimer.registerOnChangeListener { sharedPref, key ->
+                    Log.d("SharedPreferences", "key=$key was changed!")
+                    if (key == playbackUseCases.sleepTimer.getSharedPrefKey()) {
+                        Log.d("SharedPreferences", "sleepTimerIsSet was changed!")
+                        if (sharedPref.getBoolean(playbackUseCases.sleepTimer.getSharedPrefKey(), false)) {
+                            onEvent(NowPlayingEvent.SleepTimerSet)
+                        } else {
+                            onEvent(NowPlayingEvent.CancelSleepTimer)
+                        }
+                    }
+                }
+
                 resumeAllUpdates()
             }
             is NowPlayingEvent.WentToBackground -> {
+                playbackUseCases.sleepTimer.unregisterLastListener()
                 stopAllUpdates()
             }
             is NowPlayingEvent.SliderDragged -> {
@@ -68,11 +92,14 @@ class NowPlayingViewModel @Inject constructor(
             is NowPlayingEvent.SleepTimerSet -> {
                 state.isSleepTimerSet.value = true
             }
-            is NowPlayingEvent.SleepTimerCanceled -> {
+            is NowPlayingEvent.CancelSleepTimer -> {
                 state.isSleepTimerSet.value = false
+                playbackUseCases.sleepTimer.cancel()
             }
         }
     }
+
+
 
     private fun updateMetadata() {
         Log.d("NowPlaying", "Updating Static Info")
@@ -87,6 +114,8 @@ class NowPlayingViewModel @Inject constructor(
     }
 
     private fun resumeAllUpdates(onlyOnce: Boolean = false) {
+
+
         if (!isUpdating) {
             isUpdating = !onlyOnce
             resumePositionUpdates(onlyOnce)
@@ -130,6 +159,7 @@ class NowPlayingViewModel @Inject constructor(
     private fun stopAllUpdates() {
         isUpdating = false
         handler.removeCallbacksAndMessages(null)
+
         Log.d("LiveData-NowPlaying", "Stopping Updates")
     }
 

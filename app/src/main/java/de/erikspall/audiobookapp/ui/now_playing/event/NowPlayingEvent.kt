@@ -14,5 +14,5 @@ sealed class NowPlayingEvent {
     object SeekBackward: NowPlayingEvent()
     object StartedInPause: NowPlayingEvent()
     object SleepTimerSet: NowPlayingEvent()
-    object SleepTimerCanceled: NowPlayingEvent()
+    object CancelSleepTimer: NowPlayingEvent()
 }

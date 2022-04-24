@@ -31,9 +31,6 @@ class SleepTimerSheet() : BottomSheetDialogFragment() {
     @Inject
     lateinit var playbackUseCases: PlaybackUseCases
 
-    @Inject
-    lateinit var sleepTimerSharedPref: SharedPreferences
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -92,11 +89,7 @@ class SleepTimerSheet() : BottomSheetDialogFragment() {
                 )
            // setFragmentResult("isSleepTimerSet", bundleOf("sleepTimerSet" to true)) //TODO: Delete if SharedPreference is working
 
-            with (sleepTimerSharedPref.edit()) {
-                Log.d("SharedPreferences", "Setting sleepTimerIsSet to true")
-                putBoolean(getString(R.string.sleep_timer_is_set_shared_pref_key), true)
-                commit()
-            }
+
 
             this.dismiss()
         }

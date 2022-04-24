@@ -1,19 +1,18 @@
 package de.erikspall.audiobookapp.ui.now_playing
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.media3.common.MediaMetadata
 import com.bumptech.glide.Glide
@@ -21,6 +20,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentPlayerBinding
@@ -49,20 +49,10 @@ class NowPlayingFragment : Fragment() {
     private var justStarted = true
     private lateinit var sleepTimerBadge: BadgeDrawable
 
-    @Inject
-    lateinit var sleepTimerSharedPref: SharedPreferences
 
-    private val sharedPrefListener = SharedPreferences.OnSharedPreferenceChangeListener {shared, key ->
-        Log.d("SharedPreferences", "key=$key was changed!")
-        if (key == getString(R.string.sleep_timer_is_set_shared_pref_key)) {
-            Log.d("SharedPreferences", "sleepTimerIsSet was changed!")
-            if (shared.getBoolean(getString(R.string.sleep_timer_is_set_shared_pref_key), false)) {
-                viewModel.onEvent(NowPlayingEvent.SleepTimerSet)
-            } else {
-                viewModel.onEvent(NowPlayingEvent.SleepTimerCanceled)
-            }
-        }
-    }
+    //lateinit var sleepTimerSharedPref: SharedPreferences
+
+
 
     /*override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,10 +100,12 @@ class NowPlayingFragment : Fragment() {
 
     private fun setupBadge() {
         sleepTimerBadge = BadgeDrawable.create(requireContext())
-
+        sleepTimerBadge.isVisible = false
         sleepTimerBadge.backgroundColor = ColorExtractor.getPrimaryColor(requireContext())
         sleepTimerBadge.horizontalOffset = 40
         sleepTimerBadge.verticalOffset = 40
+
+
     }
 
     private fun showSleepTimerBadge() {
@@ -123,17 +115,19 @@ class NowPlayingFragment : Fragment() {
 
     private fun hideSleepTimerBadge() {
         sleepTimerBadge.isVisible = false
-        BadgeUtils.detachBadgeDrawable(sleepTimerBadge, binding.bottomAppBar.findViewById(R.id.sleep_timer_button))
+        //BadgeUtils.detachBadgeDrawable(sleepTimerBadge, binding.bottomAppBar.findViewById(R.id.sleep_timer_button))
     }
 
     private fun setupObservers() {
         playerViewModel.state.playbackState.observe(viewLifecycleOwner) { playbackState ->
             when (playbackState) {
                 Player.STATE_READY -> {
+                    binding.totalBookProgress.isIndeterminate = false
                     // Load new metaData
                     loadCover(playerViewModel.state.mediaMetadata.value!!)
                 }
                 Player.STATE_PAUSED -> {
+                    binding.totalBookProgress.isIndeterminate = false
                     // Update icons
                     Log.d("NowPlaying", "Player paused!")
                     if (justStarted){
@@ -147,12 +141,16 @@ class NowPlayingFragment : Fragment() {
                     )
                 }
                 Player.STATE_PLAYING -> {
+                    binding.totalBookProgress.isIndeterminate = false
                     // Update icons
                     Log.d("NowPlaying", "Player playing!")
                     viewModel.onEvent(NowPlayingEvent.OnPlay)
                     binding.fabPlay.setImageDrawable(
                         ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_pause)
                     )
+                }
+                else -> {
+                    // Do nothing?
                 }
             }
         }
@@ -181,20 +179,23 @@ class NowPlayingFragment : Fragment() {
         }
 
         // Check if sleepTimer is set before observing value
-        Log.d("SleepTimerBadge", "Checking if SleepTimer is set ...")
+        /*Log.d("SleepTimerBadge", "Checking if SleepTimer is set ...")
         if (sleepTimerSharedPref.getBoolean(getString(R.string.sleep_timer_is_set_shared_pref_key), false)) {
             Log.d("SleepTimerBadge", "It is set!")
             viewModel.onEvent(NowPlayingEvent.SleepTimerSet)
         } else
-            viewModel.onEvent(NowPlayingEvent.SleepTimerCanceled)
+            viewModel.onEvent(NowPlayingEvent.CancelSleepTimer)*/
+
+
 
         viewModel.state.isSleepTimerSet.observe(viewLifecycleOwner) { isSleepTimerSet ->
             Log.d("SleepTimerBadge", "SleepTimer making badge visible $isSleepTimerSet")
             if (isSleepTimerSet) {
                 showSleepTimerBadge()
-            }else
+            } else
                 hideSleepTimerBadge()
-            ///sleepTimerBadge.setVisible(isSleepTimerSet, true)
+            //sleepTimerBadge.setVisible(isSleepTimerSet, true)
+
         }
     }
 
@@ -230,13 +231,26 @@ class NowPlayingFragment : Fragment() {
         binding.bottomAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.sleep_timer_button -> {
-                    val sleepTimerSheet = SleepTimerSheet()
+                    if (viewModel.state.isSleepTimerSet.value == false) {
+                        val sleepTimerSheet = SleepTimerSheet()
 
-                    sleepTimerSheet.show(
-                        childFragmentManager,
-                        TAG_SLEEPTIMER
-                    )
+                        sleepTimerSheet.show(
+                            childFragmentManager,
+                            TAG_SLEEPTIMER
+                        )
+                    } else {
+                        MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Material3_MaterialAlertDialog_Centered)
+                            .setTitle(getString(R.string.cancle_sleep_timer_dialog_title))
+                            .setIcon(AppCompatResources.getDrawable(requireContext(), R.drawable.ic_moon))
+                            .setNegativeButton("No") { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                            .setPositiveButton("Yes") { _, _ ->
 
+                                viewModel.onEvent(NowPlayingEvent.CancelSleepTimer)
+                            }
+                            .show()
+                    }
                     true
                 }
                 R.id.chapter_button -> {
@@ -251,8 +265,8 @@ class NowPlayingFragment : Fragment() {
                 }
             }
         }
-        Log.d("SleepTimerBadge", "Registering Listener ...")
-        sleepTimerSharedPref.registerOnSharedPreferenceChangeListener(sharedPrefListener)
+        /*Log.d("SleepTimerBadge", "Registering Listener ...")
+        sleepTimerSharedPref.registerOnSharedPreferenceChangeListener(sharedPrefListener)*/
 
     }
 
@@ -282,15 +296,13 @@ class NowPlayingFragment : Fragment() {
     override fun onPause() {
         viewModel.onEvent(NowPlayingEvent.WentToBackground)
         //TODO: unregister sharedPref Listener
-        Log.d("SleepTimerBadge", "Unregistering Listener ...")
-        sleepTimerSharedPref.unregisterOnSharedPreferenceChangeListener(sharedPrefListener)
+        /*Log.d("SleepTimerBadge", "Unregistering Listener ...")
+        sleepTimerSharedPref.unregisterOnSharedPreferenceChangeListener(sharedPrefListener)*/
         super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.onEvent(NowPlayingEvent.WentToForeground)
-
-
     }
 }

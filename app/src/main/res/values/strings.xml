@@ -12,6 +12,7 @@
     <string name="duration">%s</string>
     <string name="sleep_timer_shared_pref_name">SleepTimer</string>
     <string name="sleep_timer_is_set_shared_pref_key">sleepTimerIsSet</string>
+    <string name="cancle_sleep_timer_dialog_title">Cancel Sleep Timer?</string>
     <!-- Input Dialog -->
     <string name="input_title">Search</string>
     <string name="input_message">Search for title, author, genre, ...</string>

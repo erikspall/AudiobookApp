@@ -1,6 +1,7 @@
 package de.erikspall.audiobookapp.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,7 +31,11 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun providePlaybackUseCases(repository: PlayerControllerRepository, @ApplicationContext appContext: Context): PlaybackUseCases {
+    fun providePlaybackUseCases(
+        repository: PlayerControllerRepository,
+        sharedPref: SharedPreferences,
+        @ApplicationContext appContext: Context,
+    ): PlaybackUseCases {
         return PlaybackUseCases(
             togglePlayback = TogglePlayback(repository),
             playBook = PlayBook(repository),
@@ -41,7 +46,7 @@ object UseCaseModule {
             state = State(repository),
             seekTo = SeekTo(repository),
             skip = Skip(repository),
-            sleepTimer = SleepTimer(appContext)
+            sleepTimer = SleepTimer(appContext, sharedPref)
         )
     }
 }
