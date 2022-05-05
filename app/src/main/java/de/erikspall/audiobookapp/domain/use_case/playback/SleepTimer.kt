@@ -46,6 +46,13 @@ class SleepTimer(
             putInt()
         }*/
         //Log.d("SleepTimer", "Setting SleepTimer ...")
+
+        with (sharedPref.edit()) {
+            android.util.Log.d("SharedPreferences", "Setting sleepTimerIsSet to true")
+            putBoolean(context.getString(R.string.sleep_timer_is_set_shared_pref_key), true)
+            commit()
+        }
+
         if (hasPermission)
             am.setExact(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time,
@@ -72,11 +79,7 @@ class SleepTimer(
                 )
             )
 
-        with (sharedPref.edit()) {
-            android.util.Log.d("SharedPreferences", "Setting sleepTimerIsSet to true")
-            putBoolean(context.getString(R.string.sleep_timer_is_set_shared_pref_key), true)
-            commit()
-        }
+
     }
 
     fun cancel() {

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -85,7 +86,7 @@ class NowPlayingFragment : Fragment() {
 
 
 
-        setupBadge()
+        initBadge(binding.bottomAppBar.findViewById(R.id.sleep_timer_button))
         setupListeners()
         setupObservers()
 
@@ -98,19 +99,48 @@ class NowPlayingFragment : Fragment() {
         return root
     }
 
-    private fun setupBadge() {
+   /* private fun setupBadge() {
         sleepTimerBadge = BadgeDrawable.create(requireContext())
         sleepTimerBadge.isVisible = false
         sleepTimerBadge.backgroundColor = ColorExtractor.getPrimaryColor(requireContext())
         sleepTimerBadge.horizontalOffset = 40
         sleepTimerBadge.verticalOffset = 40
+        BadgeUtils.setBadgeDrawableBounds(sleepTimerBadge, binding.bottomAppBar.findViewById(R.id.sleep_timer_button), )
+        BadgeUtils.attachBadgeDrawable(sleepTimerBadge, binding.bottomAppBar.findViewById(R.id.sleep_timer_button))
 
+    }*/
 
+    private fun initBadge(view : View) {
+
+        view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+
+            override fun onGlobalLayout() {
+
+                sleepTimerBadge = BadgeDrawable.create(requireContext()).apply {
+                    verticalOffset = 40
+                    horizontalOffset = 40
+                    backgroundColor = ColorExtractor.getPrimaryColor(requireContext())
+                    BadgeUtils.attachBadgeDrawable(this, view)
+                }
+
+                viewModel.state.isSleepTimerSet.observe(viewLifecycleOwner) { isSleepTimerSet ->
+                    Log.d("SleepTimerBadge", "SleepTimer making badge visible $isSleepTimerSet")
+                    if (isSleepTimerSet) {
+                        showSleepTimerBadge()
+                    } else
+                        hideSleepTimerBadge()
+                    //sleepTimerBadge.setVisible(isSleepTimerSet, true)
+
+                }
+
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
     }
 
     private fun showSleepTimerBadge() {
         sleepTimerBadge.isVisible = true
-        BadgeUtils.attachBadgeDrawable(sleepTimerBadge, binding.bottomAppBar.findViewById(R.id.sleep_timer_button))
+        //BadgeUtils.attachBadgeDrawable(sleepTimerBadge, binding.bottomAppBar.findViewById(R.id.sleep_timer_button))
     }
 
     private fun hideSleepTimerBadge() {
@@ -188,15 +218,7 @@ class NowPlayingFragment : Fragment() {
 
 
 
-        viewModel.state.isSleepTimerSet.observe(viewLifecycleOwner) { isSleepTimerSet ->
-            Log.d("SleepTimerBadge", "SleepTimer making badge visible $isSleepTimerSet")
-            if (isSleepTimerSet) {
-                showSleepTimerBadge()
-            } else
-                hideSleepTimerBadge()
-            //sleepTimerBadge.setVisible(isSleepTimerSet, true)
 
-        }
     }
 
 
@@ -304,5 +326,6 @@ class NowPlayingFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.onEvent(NowPlayingEvent.WentToForeground)
+
     }
 }

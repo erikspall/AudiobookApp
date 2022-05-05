@@ -33,6 +33,7 @@ class NowPlayingViewModel @Inject constructor(
         when (event) {
             is NowPlayingEvent.WentToForeground -> {
 
+                // Recover state
                 if (playbackUseCases.sleepTimer.isScheduled())
                     onEvent(NowPlayingEvent.SleepTimerSet)
                 // Else not needed, because default value is false
@@ -48,6 +49,9 @@ class NowPlayingViewModel @Inject constructor(
                         }
                     }
                 }
+
+
+
 
                 resumeAllUpdates()
             }
@@ -90,9 +94,11 @@ class NowPlayingViewModel @Inject constructor(
                 resumeAllUpdates(onlyOnce = true)
             }
             is NowPlayingEvent.SleepTimerSet -> {
+                Log.d("SleepTimer", "OnSetEvent triggered")
                 state.isSleepTimerSet.value = true
             }
             is NowPlayingEvent.CancelSleepTimer -> {
+                Log.d("SleepTimer", "OnCancelEvent triggered")
                 state.isSleepTimerSet.value = false
                 playbackUseCases.sleepTimer.cancel()
             }
