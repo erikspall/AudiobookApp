@@ -117,6 +117,8 @@ class NowPlayingViewModel @Inject constructor(
             chapterDuration = playbackUseCases.getCurrent.chapterDuration(), // Could be calc directly
             bookDuration = playbackUseCases.getCurrent.bookDuration()
         )
+        // Make sure that after a new chapter began, the slider is at 0, otherwise OutOfBounds
+        state.chapterSliderValue.value = 0
     }
 
     private fun resumeAllUpdates(onlyOnce: Boolean = false) {

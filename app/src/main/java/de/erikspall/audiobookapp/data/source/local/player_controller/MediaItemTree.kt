@@ -31,6 +31,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.ceil
 
 object MediaItemTree {
     private var treeNodes: MutableMap<String, MediaItemNode> = mutableMapOf()
@@ -296,7 +297,7 @@ object MediaItemTree {
                 val extras: Bundle = Bundle()
                 extras.putLong(
                     METADATA_KEY_DURATION,
-                    ((chapter.end_time.toDouble() - chapter.start_time.toDouble()) * 1000).toLong()
+                    ceil(((chapter.end_time.toDouble() - chapter.start_time.toDouble()) * 1000)).toLong()
                 )
                 extras.putLong(
                     METADATA_BOOK_ID,

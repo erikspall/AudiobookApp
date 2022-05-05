@@ -198,9 +198,6 @@ class NowPlayingFragment : Fragment() {
 
         viewModel.state.chapterSliderValue.observe(viewLifecycleOwner) { value ->
                 binding.chapterSlider.value = value.toFloat()
-
-
-
         }
 
         viewModel.state.position.observe(viewLifecycleOwner) { newPositions ->
