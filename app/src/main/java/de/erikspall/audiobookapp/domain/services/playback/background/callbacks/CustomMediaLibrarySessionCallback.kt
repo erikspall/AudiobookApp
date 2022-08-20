@@ -14,6 +14,8 @@ import androidx.media3.session.SessionResult
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.ListeningExecutorService
+import com.google.common.util.concurrent.MoreExecutors
 import de.erikspall.audiobookapp.data.source.local.player_controller.MediaItemTree
 import de.erikspall.audiobookapp.domain.services.playback.background.PlayerService.Companion.SEARCH_QUERY_PREFIX
 import de.erikspall.audiobookapp.domain.services.playback.background.PlayerService.Companion.SEARCH_QUERY_PREFIX_COMPAT
@@ -21,16 +23,18 @@ import de.erikspall.audiobookapp.domain.use_case.audiobook.AudiobookUseCases
 import de.erikspall.audiobookapp.domain.use_case.playback.PlaybackUseCases
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
 
 class CustomMediaLibrarySessionCallback(
     private val setMediaItemFromSearchQuery: (String) -> Unit,
     private val audiobookUseCases: AudiobookUseCases,
     private val playbackUseCases: PlaybackUseCases
-) : MediaLibrarySession.MediaLibrarySessionCallback {
+) : MediaLibrarySession.Callback {
 
 
     @SuppressLint("UnsafeOptInUsageError")
-    override fun onSetMediaUri(
+    fun onSetMediaUri(
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
         uri: Uri,
@@ -49,6 +53,27 @@ class CustomMediaLibrarySessionCallback(
         }
     }
 
+    override fun onAddMediaItems(
+        mediaSession: MediaSession,
+        controller: MediaSession.ControllerInfo,
+        mediaItems: MutableList<MediaItem>
+    ): ListenableFuture<MutableList<MediaItem>> {
+        val service = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor())
+        val futureMediaItems: ListenableFuture<MutableList<MediaItem>> = service.submit(
+            Callable<MutableList<MediaItem>> {
+                val tempMediaItems = mutableListOf<MediaItem>()
+                for (mediaItem in mediaItems) {
+                    if (mediaItems.contains(mediaItem))
+                        tempMediaItems.add(
+                            MediaItemTree.getItem(mediaItem.mediaId) ?: mediaItem
+                        )
+
+                }
+                tempMediaItems
+            }
+        )
+        return futureMediaItems
+    }
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun onGetLibraryRoot(

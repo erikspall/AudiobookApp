@@ -78,6 +78,7 @@ object MediaItemTree {
             .setStartPositionMs(startTime ?: 0)
             .setEndPositionMs(endTime ?: C.TIME_END_OF_SOURCE)
             .build()
+
         val metadata = MediaMetadata.Builder()
             .setAlbumTitle(bookTitle)
             .setTitle(title)
@@ -87,9 +88,10 @@ object MediaItemTree {
             .setIsPlayable(isPlayable)
             .setArtworkUri(coverUri)
             .setAlbumArtist(narrator)
-            .setMediaUri(sourceUri)
+            //.setMediaUri(sourceUri)
             .setExtras(extras)
             .build()
+
         return MediaItem.Builder()
             .setMediaId(mediaId)
             .setMediaMetadata(metadata)

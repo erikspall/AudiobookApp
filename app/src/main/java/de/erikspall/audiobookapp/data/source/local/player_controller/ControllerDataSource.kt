@@ -16,7 +16,7 @@ class ControllerDataSource(
 ) {
     private var controllerFuture: ListenableFuture<MediaController>? = null
     val controller: MediaController?
-        get() = if (controllerFuture?.isDone ?: false) controllerFuture!!.get() else null
+        get() = if (controllerFuture?.isDone == true) controllerFuture!!.get() else null
 
 
     @SuppressLint("UnsafeOptInUsageError")

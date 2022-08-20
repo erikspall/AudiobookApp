@@ -4,13 +4,11 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_MAIN
 import android.content.Intent.CATEGORY_LAUNCHER
 import android.content.SharedPreferences
 import android.os.Build
-import android.preference.PreferenceManager
 import androidx.core.animation.doOnEnd
 import androidx.media3.common.AudioAttributes
 import androidx.media3.exoplayer.ExoPlayer
@@ -18,11 +16,9 @@ import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import dagger.hilt.android.AndroidEntryPoint
 import de.erikspall.audiobookapp.MainActivity
-import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.data.source.local.player_controller.MediaItemTree
 import de.erikspall.audiobookapp.domain.const.PlaybackService.ACTION_QUIT
 import de.erikspall.audiobookapp.domain.services.playback.background.callbacks.CustomMediaLibrarySessionCallback
-import de.erikspall.audiobookapp.domain.services.playback.background.filler.CustomMediaItemFiller
 import de.erikspall.audiobookapp.domain.services.playback.background.listeners.PlayerListener
 import de.erikspall.audiobookapp.domain.use_case.audiobook.AudiobookUseCases
 import de.erikspall.audiobookapp.domain.use_case.playback.PlaybackUseCases
@@ -43,6 +39,7 @@ class PlayerService : MediaLibraryService() {
 
     private lateinit var player: ExoPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
+
     private val playerListener = PlayerListener(
         onMediaMetadataChangeEvent = {
             MainScope().launch {
@@ -128,7 +125,6 @@ class PlayerService : MediaLibraryService() {
 
         mediaLibrarySession =
             MediaLibrarySession.Builder(this, player, librarySessionCallback)
-                .setMediaItemFiller(CustomMediaItemFiller())
                 .setSessionActivity(buildIntent())
                 .build()
     }

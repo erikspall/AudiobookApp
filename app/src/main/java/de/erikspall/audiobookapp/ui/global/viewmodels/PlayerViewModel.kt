@@ -115,13 +115,14 @@ class PlayerViewModel @Inject constructor(
                 val chapterId = playbackUseCases.getCurrent.chapterId()
                 val position = playbackUseCases.getCurrent.positionInBook()
 
+                if (bookId != -1L && chapterId != -1L) {
                     savePosition(
                         bookId,
                         chapterId,
                         position,
                         /* isPlaying */ false
                     )
-
+                }
                 playbackUseCases.playBook(event.audiobook)
             }
             is PlayerEvent.LibraryWentToForeground -> {
