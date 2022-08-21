@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Erik/AndroidStudioProjects/AudiobookApp/app/src/main/res/layout/fragment_library.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/Erik/AndroidStudioProjects/AudiobookApp/app/src/main/res/layout/mini_player.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.5661458333333333" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/gradient.xml" value="0.315" />
         <entry key="..\:/Users/eriks/AndroidStudioProjects/AudiobookApp/app/src/main/res/drawable/ic_add.xml" value="0.356" />

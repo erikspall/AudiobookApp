@@ -3,6 +3,7 @@ package de.erikspall.audiobookapp.di
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.android.gms.cast.framework.CastContext
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

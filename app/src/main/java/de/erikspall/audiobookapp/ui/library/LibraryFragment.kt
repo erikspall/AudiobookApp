@@ -1,12 +1,15 @@
 package de.erikspall.audiobookapp.ui.library
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat.getDrawable
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
@@ -14,22 +17,27 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.media3.common.MediaMetadata
+import androidx.mediarouter.app.MediaRouteButton
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.gms.cast.framework.CastButtonFactory
+import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
 import de.erikspall.audiobookapp.R
 import de.erikspall.audiobookapp.databinding.FragmentLibraryBinding
 import de.erikspall.audiobookapp.domain.const.Layout
 import de.erikspall.audiobookapp.domain.const.Player
+import de.erikspall.audiobookapp.domain.util.ColorExtractor
 import de.erikspall.audiobookapp.domain.util.Conversion
 import de.erikspall.audiobookapp.ui.global.events.PlayerEvent
 import de.erikspall.audiobookapp.ui.global.viewmodels.PlayerViewModel
 import de.erikspall.audiobookapp.ui.library.adapter.AudioBookCardAdapter
 import de.erikspall.audiobookapp.ui.library.event.LibraryEvent
 import de.erikspall.audiobookapp.ui.library.viewmodel.LibraryViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LibraryFragment : Fragment() {
@@ -39,6 +47,10 @@ class LibraryFragment : Fragment() {
     private val viewModel: LibraryViewModel by viewModels()
     private val playerViewModel: PlayerViewModel by activityViewModels()
 
+    private var isCastPlayerButtonBuild = false
+
+    private lateinit var castContext: CastContext
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,6 +58,11 @@ class LibraryFragment : Fragment() {
     ): View? {
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        castContext = CastContext.getSharedInstance(requireContext())
+
+        CastButtonFactory.setUpMediaRouteButton(requireContext(), binding.miniPlayer.castButton)
+        colorWorkaroundForCastIcon(binding.miniPlayer.castButton)
 
         pushMiniPlayerAboveNavBar()
         pushRecyclerViewItemsAboveNavBar()
@@ -162,6 +179,7 @@ class LibraryFragment : Fragment() {
         binding.miniPlayer.container.visibility = View.VISIBLE
         binding.miniPlayerBackground.visibility = View.VISIBLE
         binding.miniPlayer.playButton.visibility = View.VISIBLE
+
         binding.miniPlayer.castButton.visibility = View.VISIBLE
         binding.miniPlayer.currentBookProgress.isIndeterminate = false
         //binding.miniPlayer.currentBookProgress.setProgress(playerViewModel.progressBig(), false)
@@ -256,5 +274,24 @@ class LibraryFragment : Fragment() {
 
     private fun pushRecyclerContentAboveMiniPlayer(miniPlayerHeight: Int = 50) {
         binding.libraryRecyclerView.setPadding(8, 0, 8, Conversion.dpToPx(miniPlayerHeight + 8))
+    }
+
+    private fun colorWorkaroundForCastIcon(button: MediaRouteButton?) {
+        Log.d("RouteProvider", "I was called!!")
+        if (button == null) return
+        val castContext: Context =
+            ContextThemeWrapper(context, androidx.mediarouter.R.style.Theme_MediaRouter)
+        val a = castContext.obtainStyledAttributes(
+            null,
+            androidx.mediarouter.R.styleable.MediaRouteButton,
+            androidx.mediarouter.R.attr.mediaRouteButtonStyle,
+            0
+        )
+        val drawable =
+            a.getDrawable(androidx.mediarouter.R.styleable.MediaRouteButton_externalRouteEnabledDrawable)
+        a.recycle()
+        DrawableCompat.setTint(drawable!!, ColorExtractor.getPrimaryColor(requireContext()))
+        drawable.state = button.drawableState
+        button.setRemoteIndicatorDrawable(drawable)
     }
 }
